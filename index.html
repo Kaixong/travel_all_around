@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旅遊手冊</title>
+    <title>Travel App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,8 +14,7 @@
         </header>
 
         <div id="content-wrapper">
-            <div id="content">
-                </div>
+            <div id="content"></div>
         </div>
 
         <nav class="tab-bar">
@@ -29,10 +28,11 @@
 
     <script>
         let db = {};
+        let currentDayIdx = 0;
         let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
 
         async function init() {
-            // 強制更新機制：加上時間戳記繞過快取
+            // 強制更新機制
             const res = await fetch('data.json?t=' + new Date().getTime());
             db = await res.json();
             document.getElementById('trip-title').innerText = db.trip_name;
@@ -44,72 +44,77 @@
             checkedItems[id] = !checkedItems[id];
             localStorage.setItem('trip_checked', JSON.stringify(checkedItems));
             const el = document.getElementById(id);
-            if (checkedItems[id]) el.classList.add('done');
-            else el.classList.remove('done');
+            if (el) el.classList.toggle('done', checkedItems[id]);
+        }
+
+        async function fetchWeather(location, date) {
+            try {
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`);
+                const geoData = await geoRes.json();
+                if (!geoData.length) return "📍 地點格式不符";
+                const { lat, lon } = geoData[0];
+                const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto&start_date=${date}&end_date=${date}`);
+                const wData = await wRes.json();
+                const code = wData.daily.weathercode[0];
+                const max = Math.round(wData.daily.temperature_2m_max[0]);
+                const min = Math.round(wData.daily.temperature_2m_min[0]);
+                const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
+                return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
+            } catch (e) { return "暫無天氣資訊"; }
+        }
+
+        async function renderSchedule() {
+            const container = document.getElementById('content');
+            const dayData = db.schedule[currentDayIdx];
+            
+            let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => 
+                `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}</button>`
+            ).join('') + `</div>`;
+
+            container.innerHTML = `<h2>🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在同步天氣...</div><div id="schedule-list"></div>`;
+            
+            fetchWeather(dayData.location, dayData.date).then(info => {
+                document.getElementById('weather-box').innerText = info;
+            });
+
+            document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
+                <div class="schedule-item">
+                    <div class="time-tag">${item.time}</div>
+                    <div class="schedule-info">
+                        <div class="schedule-title">${item.content}</div>
+                        ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
+                        ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 查看地圖</a>` : ''}
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderListPage(page) {
+            const container = document.getElementById('content');
+            const list = page === 'notes' ? db.notes : db.gifts;
+            container.innerHTML = `<h2>${page==='notes'?'🚩 注意事項':'🛍️ 必買清單'}</h2>` + 
+                list.map((item, i) => {
+                    const id = `${page}-${i}`;
+                    return `<div class="list-item ${checkedItems[id]?'done':''}" id="${id}" onclick="toggleCheck('${id}')">${item}</div>`;
+                }).join('');
         }
 
         function changePage(page) {
             const container = document.getElementById('content');
-            
-            // 觸發淡入動畫
             container.classList.remove('fade-in');
-            void container.offsetWidth; 
+            void container.offsetWidth;
             container.classList.add('fade-in');
 
-            let html = "";
-
-            if(page === 'home') {
-                html = `
-                    <div class="card home-card">
-                        <div class="icon">✈️</div>
-                        <h2>${db.destination}</h2>
-                        <p>行程準備就緒</p>
-                        <p style="font-size: 0.9em; color: #888;">點擊下方導覽切換分頁</p>
-                    </div>`;
-            } 
-            else if(page === 'notes' || page === 'gifts') {
-                const list = page === 'notes' ? db.notes : db.gifts;
-                html = `<h2>${page==='notes'?'🚩 注意事項':'🛍️ 必買清單'}</h2>`;
-                html += list.map((item, i) => {
-                    const id = `${page}-${i}`;
-                    const isDone = checkedItems[id] ? 'done' : '';
-                    return `<div class="list-item ${isDone}" id="${id}" onclick="toggleCheck('${id}')">${item}</div>`;
-                }).join('');
-            } 
-            else if(page === 'schedule') {
-                html = `<h2>🗺️ 詳細行程</h2>`;
-                db.schedule.forEach(dayGroup => {
-                    html += `<div class="day-section">
-                                <div class="day-header">Day ${dayGroup.day}</div>`;
-                    dayGroup.items.forEach(item => {
-                        html += `
-                            <div class="schedule-item">
-                                <div class="time-tag">${item.time}</div>
-                                <div class="schedule-info">
-                                    <div class="schedule-title">${item.content}</div>
-                                    ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
-                                    ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 查看地圖</a>` : ''}
-                                </div>
-                            </div>`;
-                    });
-                    html += `</div>`;
-                });
-            } 
+            if(page === 'schedule') renderSchedule();
+            else if(page === 'notes' || page === 'gifts') renderListPage(page);
+            else if(page === 'home') container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>準備出發！</p></div>`;
             else if(page === 'expenses') {
                 let total = 0;
-                html = `<h2>💰 開銷明細</h2>`;
-                html += db.expenses.map((e, i) => {
+                container.innerHTML = `<h2>💰 開銷明細</h2>` + db.expenses.map((e, i) => {
                     const id = `exp-${i}`;
-                    const isDone = checkedItems[id] ? 'done' : '';
                     total += parseInt(e.cost);
-                    return `<div class="list-item ${isDone}" id="${id}" onclick="toggleCheck('${id}')">
-                                <span>${e.item}</span><span>$${e.cost}</span>
-                            </div>`;
-                }).join('');
-                html += `<div class="total">總計預算：$${total}</div>`;
+                    return `<div class="list-item ${checkedItems[id]?'done':''}" id="${id}" onclick="toggleCheck('${id}')"><span>${e.item}</span><span>$${e.cost}</span></div>`;
+                }).join('') + `<div class="total">總計預算：$${total}</div>`;
             }
-            
-            container.innerHTML = html;
             document.getElementById('content-wrapper').scrollTo(0, 0);
         }
 
