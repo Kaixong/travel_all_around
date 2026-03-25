@@ -72,13 +72,26 @@
             } 
             else if(page === 'schedule') {
                 html = `<h2>詳細行程</h2>`;
-                db.schedule.forEach(s => {
-                    html += `<div class="day-box">
-                                <div class="day-title">Day ${s.day}</div>
-                                <div class="day-content">${s.detail.replace(/\n/g, '<br>')}</div>
-                             </div>`;
+                db.schedule.forEach(dayGroup => {
+                    html += `<div class="day-section">
+                                <div class="day-header">Day ${dayGroup.day}</div>`;
+                    
+                    dayGroup.items.forEach(item => {
+                        html += `
+                            <div class="schedule-item">
+                                <div class="time-tag">${item.time}</div>
+                                <div class="schedule-info">
+                                    <div class="schedule-title">${item.content}</div>
+                                    ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
+                                    ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 查看地圖</a>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
                 });
-            } 
+            }
             else if(page === 'expenses') {
                 let total = 0;
                 html = `<h2>開銷明細</h2>`;
