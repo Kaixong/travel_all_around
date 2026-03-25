@@ -1,93 +1,206 @@
+/* --- 基礎變數與度假風配色 --- */
 :root { 
-    --primary: #8acdd7; --secondary: #ffebcc; --accent: #ff9e7d;
-    --bg: #fffbf5; --card-bg: #ffffff; --text: #4a4a4a; --subtext: #888888;
+    --primary: #8acdd7;     /* 柔和海洋藍 */
+    --secondary: #ffebcc;   /* 淺米沙灘色 */
+    --accent: #ff9e7d;      /* 溫暖夕陽橙 */
+    --bg: #fffbf5;          /* 暖白背景 */
+    --card-bg: #ffffff;     /* 卡片純白 */
+    --text: #4a4a4a;        /* 深灰文字 */
+    --subtext: #888888;     /* 輔助文字 */
     --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+/* --- 夜覽模式顏色 --- */
 .dark-mode {
-    --primary: #5baebc; --secondary: #3d3a35; --accent: #e58b6c;
-    --bg: #1a1c1e; --card-bg: #2d2f31; --text: #e1e2e3; --subtext: #a1a2a3;
+    --primary: #5baebc;
+    --secondary: #3d3a35;
+    --accent: #e58b6c;
+    --bg: #1a1c1e;
+    --card-bg: #2d2f31;
+    --text: #e1e2e3;
+    --subtext: #a1a2a3;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* 滾動優化核心：移除 body 限制，讓 window 負責滾動 */
+/* --- 全域滾動優化 (核心修復) --- */
 body { 
-    font-family: 'Fredoka', 'Noto Sans TC', sans-serif; 
-    margin: 0; background: var(--bg); color: var(--text); 
+    font-family: 'Fredoka', 'Noto Sans TC', -apple-system, sans-serif; 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--text); 
     transition: background 0.3s;
+    /* 允許全域滾動，移除局部容器限制 */
     overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* 開啟 iOS 動量滾動 */
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch; 
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* 增加最小高度確保一定可以產生滾動感 */
-main#content {
-    padding: 20px 20px 140px 20px; 
-    box-sizing: border-box;
-    min-height: 101vh; 
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 101vh; /* 強制產生極小滾動區域以活化 iOS 滾動引擎 */
 }
 
-/* Header 固頂 */
+/* --- 標題與內容區 --- */
 header { 
-    position: sticky; top: 0;
-    background: var(--card-bg); color: var(--primary); padding: 15px; 
-    text-align: center; box-shadow: var(--shadow); cursor: pointer; z-index: 1001;
+    position: sticky;
+    top: 0;
+    background: var(--card-bg); 
+    color: var(--primary); 
+    padding: 15px; 
+    text-align: center; 
+    box-shadow: var(--shadow); 
+    z-index: 1001;
+    cursor: pointer;
 }
 header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 .refresh-hint { font-size: 0.6rem; opacity: 0.5; display: block; }
 
-/* 卡片設計：確保不攔截滾動手勢 */
-.card, .list-item, .schedule-info, .total-box, .hotel-card { 
-    background: var(--card-bg); padding: 20px; border-radius: 20px; 
-    box-shadow: var(--shadow); margin-bottom: 15px; 
-    touch-action: pan-y; /* 明確告知只處理垂直滑動 */
+main#content {
+    padding: 20px 20px 140px 20px;
+    box-sizing: border-box;
 }
 
-/* 其他視覺元件樣式維持一致 */
-.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
+/* --- 首頁 Hero 視覺 --- */
+.home-hero { text-align: center; padding: 10px 0 25px; }
+.hero-icon { font-size: 3rem; margin-bottom: 5px; }
+.hero-title { font-size: 1.4rem; margin: 0; color: var(--text); font-weight: 700; }
+.hero-date { font-size: 0.85rem; opacity: 0.5; margin-top: 5px; }
+.section-label { font-size: 0.75rem; font-weight: bold; color: var(--primary); margin: 25px 0 12px 5px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+/* --- 登機證風格機票 (美感升級) --- */
+.ticket {
+    background: var(--card-bg);
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.03);
+    touch-action: pan-y; /* 確保按在機票上也能滑動 */
+}
+
+.ticket-header {
+    background: var(--primary);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.ticket-body {
+    padding: 25px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.station .code { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1; font-family: 'Fredoka', sans-serif; }
+.station .city { font-size: 0.75rem; opacity: 0.6; margin-top: 6px; font-weight: 500; }
+
+.flight-icon { 
+    font-size: 1.2rem; 
+    position: relative; 
+    flex: 1; 
+    text-align: center;
+    opacity: 0.4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.flight-icon::before {
+    content: "";
+    position: absolute;
+    width: 60%;
+    border-top: 2px dashed var(--primary);
+    z-index: 0;
+}
+
+.ticket-footer {
+    padding: 15px 20px;
+    border-top: 2px dashed var(--bg); /* 模擬撕票線 */
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ticket-footer .time { font-size: 0.9rem; font-weight: 600; color: var(--accent); }
+.ticket-footer .memo { font-size: 0.7rem; opacity: 0.5; font-style: italic; }
+
+/* --- 行程：分頁與天氣 --- */
+.day-tabs { 
+    display: flex; gap: 10px; overflow-x: auto; 
+    padding: 10px 0 20px; scrollbar-width: none; 
+    position: sticky; top: 65px; background: var(--bg); z-index: 1000;
+}
+.day-tabs::-webkit-scrollbar { display: none; }
+.day-tabs button { 
+    min-width: 80px; padding: 10px; border-radius: 15px; border: none; 
+    background: var(--card-bg); color: var(--subtext); font-size: 0.8rem;
+    box-shadow: var(--shadow); transition: 0.2s;
+}
+.day-tabs button.active { background: var(--secondary); border: 1.2px solid var(--accent); color: var(--text); font-weight: 600; }
+
+.weather-box { 
+    background: linear-gradient(135deg, #a7e5e6, var(--primary));
+    color: white; padding: 15px; border-radius: 18px; margin-bottom: 25px; 
+    text-align: center; font-size: 0.85rem; font-weight: 500; box-shadow: var(--shadow);
+}
+
+/* --- 行程項目與卡片 --- */
+.card, .list-item, .schedule-info, .hotel-card { 
+    background: var(--card-bg); padding: 20px; border-radius: 20px; 
+    box-shadow: var(--shadow); margin-bottom: 18px; 
+    touch-action: pan-y; /* 修復大拇指按壓滑動 */
+}
+
+.hotel-card { background: var(--secondary); border: 1.5px solid var(--accent); }
+.hotel-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; }
+.hotel-name { font-size: 1rem; font-weight: 600; }
+
+.schedule-item { display: flex; gap: 15px; margin-bottom: 25px; }
+.time-tag { color: var(--primary); font-weight: 700; min-width: 50px; font-size: 0.9rem; padding-top: 18px; text-align: center; }
+.schedule-info { flex: 1; border-left: 4px solid var(--primary); }
+.schedule-title { font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; }
+.schedule-memo { font-size: 0.85rem; color: var(--subtext); line-height: 1.5; }
+
+/* --- 清單與按鈕 --- */
 .list-item { border-left: 8px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
 .list-item.done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
 
-.quick-info-box {
-    margin-top: 20px; text-align: left; background: var(--bg); 
-    border-radius: 15px; padding: 15px; border: 1px dashed var(--primary);
+.map-link, .map-link-mini { 
+    font-size: 0.7rem; color: var(--accent); border: 1.2px solid var(--accent); 
+    padding: 5px 12px; border-radius: 25px; text-decoration: none; 
+    margin-top: 10px; display: inline-block; font-weight: 500;
 }
-.info-label { font-size: 0.7rem; font-weight: bold; color: var(--primary); display: block; }
-.info-val { font-size: 0.85rem; margin-top: 2px; }
+.map-link-mini { background: var(--card-bg); border-color: transparent; }
 
-.hotel-card { background: var(--secondary); border: 1.5px solid var(--accent); }
-.hotel-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
-.hotel-name { font-size: 0.95rem; font-weight: 500; }
-.hotel-addr { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
-
-.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; position: sticky; top: 75px; background: var(--bg); z-index: 9; padding-top: 5px; }
-.day-tabs button { min-width: 75px; padding: 8px; border-radius: 12px; border: none; background: var(--card-bg); color: var(--subtext); font-size: 0.8rem; box-shadow: var(--shadow); }
-.day-tabs button.active { background: var(--secondary); border: 1px solid var(--accent); color: var(--text); font-weight: 500; }
-
-.weather-box { background: linear-gradient(135deg, #a7e5e6, var(--primary)); color: white; padding: 12px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-size: 0.85rem; }
-
-.schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
-.time-tag { color: var(--primary); font-weight: 600; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
-.map-link, .map-link-mini { font-size: 0.7rem; color: var(--accent); border: 1.2px solid var(--accent); padding: 4px 10px; border-radius: 20px; text-decoration: none; display: inline-block; }
-.map-link-mini { background: var(--card-bg); border-color: transparent; margin-top: 8px; }
-
-/* 懸浮元件 */
+/* --- 懸浮元件 (FAB & BackToTop) --- */
 #back-to-top {
-    position: fixed; right: 25px; bottom: calc(100px + env(safe-area-inset-bottom));
-    width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg);
+    position: fixed; right: 25px; bottom: calc(105px + env(safe-area-inset-bottom));
+    width: 48px; height: 48px; border-radius: 50%; background: var(--card-bg);
     color: var(--primary); border: 1px solid var(--primary); box-shadow: var(--shadow);
-    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
     z-index: 999; opacity: 0; transform: translateY(20px); transition: 0.3s; pointer-events: none;
 }
 #back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-#fab-nav { position: fixed; right: 20px; bottom: calc(25px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: flex-end; z-index: 1000; }
-.fab-trigger { width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.3rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-.nav-menu { background: var(--card-bg); border-radius: 20px; padding: 10px; margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--primary); display: flex; flex-direction: column; gap: 4px; transform-origin: bottom right; transition: 0.3s; width: 130px; }
+#fab-nav { position: fixed; right: 20px; bottom: calc(30px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: flex-end; z-index: 1000; }
+.fab-trigger { width: 58px; height: 58px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.15); font-size: 1.4rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; }
+.nav-menu { background: var(--card-bg); border-radius: 22px; padding: 12px; margin-bottom: 15px; box-shadow: var(--shadow); border: 1px solid var(--primary); display: flex; flex-direction: column; gap: 5px; transform-origin: bottom right; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 140px; }
 .nav-closed .nav-menu { transform: scale(0); opacity: 0; pointer-events: none; }
 .nav-closed .icon-close, #fab-nav:not(.nav-closed) .icon-open { display: none; }
-.nav-menu button { border: none; background: none; padding: 12px; text-align: left; color: var(--text); font-size: 0.9rem; display: flex; gap: 10px; }
-.mode-btn { color: var(--accent) !important; font-weight: 600; }
+.nav-menu button { border: none; background: none; padding: 12px; text-align: left; color: var(--text); font-size: 0.95rem; display: flex; align-items: center; gap: 12px; border-radius: 12px; }
+.nav-menu button:active { background: var(--bg); }
+.mode-btn { color: var(--accent) !important; font-weight: 700; }
 
-.fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* --- 動畫 --- */
+.fade-in { animation: fadeIn 0.4s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.total-box { text-align: right; border-top: 4px solid var(--accent); margin-top: 25px; }
+.total-amount { color: var(--accent); font-weight: 800; font-size: 1.4rem; margin-left: 8px; }
