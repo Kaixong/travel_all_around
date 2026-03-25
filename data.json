@@ -1,52 +1,51 @@
 {
-  "trip_name": "福州三日遊 (範例)",
-  "destination": "福州",
+  "trip_name": "我的旅遊手冊 (2026版)",
+  "destination": "福州三日遊",
   "date": "2026-03-27 ~ 2026-03-29",
   "notes": [
     "台胞證 (正本)",
-    "支付寶 / 微信支付確認",
-    "中港澳網卡 / 漫遊",
-    "馬祖小三通船票預約"
+    "確認支付寶實名認證",
+    "中港澳漫遊設定",
+    "預約小三通船票"
   ],
   "schedule": [
     {
       "day": 1,
+      "date": "2026-03-27",
+      "location": "馬祖南竿",
       "items": [
-        {
-          "time": "09:00",
-          "content": "馬祖南竿碼頭",
-          "link": "https://maps.app.goo.gl/XYZ123",
-          "memo": "提早 30 分鐘現場取票"
-        },
-        {
-          "time": "14:00",
-          "content": "三坊七巷",
-          "link": "https://maps.app.goo.gl/ABC456",
-          "memo": "必拍愛心樹，推薦試試茉莉花茶"
-        }
+        { "time": "09:00", "content": "南竿碼頭取票", "link": "https://maps.app.goo.gl/xxx", "memo": "提早30分鐘抵達" },
+        { "time": "14:00", "content": "抵達福州：三坊七巷", "link": "https://maps.app.goo.gl/yyy", "memo": "必看愛心樹" }
       ]
     },
     {
       "day": 2,
+      "date": "2026-03-28",
+      "location": "福州市煙台山",
       "items": [
-        {
-          "time": "10:00",
-          "content": "煙台山歷史風貌區",
-          "link": "https://maps.app.goo.gl/DEF789",
-          "memo": "歐式建築攝影聖地"
-        }
+        { "time": "10:00", "content": "煙台山歷史風貌區", "link": "https://maps.app.goo.gl/zzz", "memo": "歐式建築攝影" },
+        { "time": "18:00", "content": "閩江遊船", "link": "", "memo": "欣賞夜景" }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2026-03-29",
+      "location": "福州市",
+      "items": [
+        { "time": "11:00", "content": "上下杭商圈", "link": "", "memo": "採買伴手禮" },
+        { "time": "15:00", "content": "搭車前往碼頭回程", "link": "", "memo": "" }
       ]
     }
   ],
   "gifts": [
     "茉莉花茶",
-    "福州脫胎漆器",
+    "同利肉燕",
     "橄欖",
-    "同利肉燕"
+    "漆器工藝品"
   ],
   "expenses": [
-    {"item": "來回船票", "cost": "1500"},
-    {"item": "飯店 (兩晚)", "cost": "3200"},
-    {"item": "預備金", "cost": "5000"}
+    {"item": "船票", "cost": "1500"},
+    {"item": "飯店", "cost": "3200"},
+    {"item": "餐費預估", "cost": "3000"}
   ]
 }
