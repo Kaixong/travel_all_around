@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>旅遊手冊</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1 id="trip-title">載入中...</h1>
+            <p id="trip-date"></p>
+        </header>
+
+        <div id="content" class="scroll-area">
+            </div>
+
+        <nav class="tab-bar">
+            <button onclick="render('home')">首頁</button>
+            <button onclick="render('notes')">注意</button>
+            <button onclick="render('schedule')">行程</button>
+            <button onclick="render('gifts')">必買</button>
+            <button onclick="render('expenses')">明細</button>
+        </nav>
+    </div>
+
+    <script>
+        let db = {};
+
+        async function init() {
+            // 讀取同資料夾下的 JSON 檔案
+            const res = await fetch('data.json');
+            db = await res.json();
+            document.getElementById('trip-title').innerText = db.trip_name;
+            document.getElementById('trip-date').innerText = db.date;
+            render('home');
+        }
+
+        function render(page) {
+            const container = document.getElementById('content');
+            let html = "";
+            
+            if(page === 'home') {
+                html = `<div class="card"><h2>目的地：${db.destination}</h2><p>點擊下方選單查看細節</p></div>`;
+            } else if(page === 'notes') {
+                html = `<h2>注意事項</h2><ul>${db.notes.map(i => `<li>${i}</li>`).join('')}</ul>`;
+            } else if(page === 'schedule') {
+                html = `<h2>行程規劃</h2>${db.schedule.map(s => `<div class="item"><strong>Day ${s.day}</strong><p>${s.detail}</p></div>`).join('')}`;
+            } else if(page === 'gifts') {
+                html = `<h2>必買清單</h2><ul>${db.gifts.map(g => `<li>${g}</li>`).join('')}</ul>`;
+            } else if(page === 'expenses') {
+                html = `<h2>開銷明細</h2><table border="1">${db.expenses.map(e => `<tr><td>${e.item}</td><td>${e.cost}</td></tr>`).join('')}</table>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        init();
+    </script>
+</body>
+</html>
