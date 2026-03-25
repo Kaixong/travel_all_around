@@ -11,12 +11,10 @@
     <div id="app">
         <header onclick="init()">
             <h1 id="trip-title">載入中...</h1>
-            <span class="refresh-hint">點擊同步並回首頁 🔄</span>
+            <span class="refresh-hint">點擊同步資料回首頁 🔄</span>
         </header>
 
-        <div id="content-wrapper">
-            <div id="content"></div>
-        </div>
+        <main id="content" class="fade-in"></main>
 
         <button id="back-to-top" onclick="scrollToTop()">↑</button>
 
@@ -41,19 +39,18 @@
         let db = {};
         let currentDayIdx = 0;
         let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
-        
-        const wrapper = document.getElementById('content-wrapper');
-        const bttBtn = document.getElementById('back-to-top');
 
         if (localStorage.getItem('theme') === 'dark') document.body.className = 'dark-mode';
 
-        wrapper.onscroll = function() {
-            if (wrapper.scrollTop > 300) bttBtn.classList.add('show');
+        // 監聽全域滾動
+        window.onscroll = function() {
+            const bttBtn = document.getElementById('back-to-top');
+            if (window.scrollY > 300) bttBtn.classList.add('show');
             else bttBtn.classList.remove('show');
         };
 
         function scrollToTop() {
-            wrapper.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function init() {
@@ -111,7 +108,7 @@
                     <div class="hotel-header">🏨 今日下榻飯店</div>
                     <div class="hotel-name">${dayData.hotel.name}</div>
                     <div class="hotel-addr">${dayData.hotel.address}</div>
-                    ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">開啟地圖導航</a>` : ''}
+                    ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">開啟導航</a>` : ''}
                 </div>` : '';
 
             container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div>${hotelHtml}<div id="schedule-list"></div>`;
@@ -125,7 +122,7 @@
                         ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 地點詳情</a>` : ''}
                     </div>
                 </div>`).join('');
-            wrapper.scrollTo(0, 0);
+            window.scrollTo(0, 0);
         }
 
         function changePage(page) {
@@ -133,7 +130,6 @@
             container.classList.remove('fade-in');
             void container.offsetWidth;
             container.classList.add('fade-in');
-            
             document.getElementById('fab-nav').classList.add('nav-closed');
 
             if(page === 'schedule') renderSchedule();
@@ -144,7 +140,7 @@
             }
             else if(page === 'home') {
                 const flightHtml = db.flights ? db.flights.map(f => `<div class="info-item"><span class="info-label">✈️ ${f.type}</span><div class="info-val">${f.info}</div></div>`).join('') : '';
-                container.innerHTML = `<div class="card home-card"><div class="icon">🌴</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div><p style="margin-top:20px; font-size:0.75rem; opacity:0.4;">Have a nice trip!</p></div>`;
+                container.innerHTML = `<div class="card home-card"><div class="icon">🌴</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div></div>`;
             }
             else if(page === 'expenses') {
                 let total = 0;
@@ -153,7 +149,7 @@
                     return `<div class="list-item ${checkedItems['exp-'+i]?'done':''}" id="exp-${i}" onclick="toggleCheck('exp-${i}')"><span>${e.item}</span><span class="cost">$${e.cost}</span></div>`;
                 }).join('') + `<div class="total-box">總計：<span class="total-amount">$${total}</span></div>`;
             }
-            wrapper.scrollTo(0, 0);
+            window.scrollTo(0, 0);
         }
         init();
     </script>
