@@ -1,68 +1,232 @@
+/* --- 基礎變數與度假風配色 --- */
 :root { 
-    --primary: #8acdd7; --secondary: #ffebcc; --accent: #ff9e7d;
-    --bg: #fffbf5; --card-bg: #ffffff; --text: #4a4a4a; --subtext: #888888;
+    --primary: #8acdd7;     /* 柔和海洋藍 */
+    --secondary: #ffebcc;   /* 淺米沙灘色 */
+    --accent: #ff9e7d;      /* 溫暖夕陽橙 */
+    --bg: #fffbf5;          /* 暖白背景 */
+    --card-bg: #ffffff;     /* 卡片純白 */
+    --text: #4a4a4a;        /* 深灰文字 */
+    --subtext: #888888;     /* 輔助文字 */
+    --tab-bar-bg: rgba(255, 255, 255, 0.95);
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+/* --- 夜覽模式顏色覆蓋 --- */
 .dark-mode {
-    --primary: #5baebc; --secondary: #4a3f2f; --accent: #e58b6c;
-    --bg: #1a1c1e; --card-bg: #2d2f31; --text: #e1e2e3; --subtext: #a1a2a3;
+    --primary: #5baebc;
+    --secondary: #3d3a35;   /* 深暖褐色 */
+    --accent: #e58b6c;
+    --bg: #1a1c1e;          /* 深色背景 */
+    --card-bg: #2d2f31;     /* 深灰色卡片 */
+    --text: #e1e2e3;
+    --subtext: #a1a2a3;
+    --tab-bar-bg: rgba(45, 47, 49, 0.95);
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-body { font-family: 'Fredoka', 'Noto Sans TC', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; overflow: hidden; }
+/* --- 整體佈局 --- */
+body { 
+    font-family: 'Fredoka', 'Noto Sans TC', -apple-system, sans-serif; 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--text); 
+    transition: background 0.3s ease, color 0.3s ease;
+    overflow: hidden; /* 防止整個視窗滾動，改由 content-wrapper 滾動 */
+}
 
+#app { 
+    display: flex; 
+    flex-direction: column; 
+    height: 100vh; 
+}
+
+/* --- 迷你標題 Header --- */
 header { 
-    background: var(--card-bg); color: var(--primary); padding: 15px; 
-    text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer;
+    background: var(--card-bg); 
+    color: var(--primary); 
+    padding: 15px; 
+    text-align: center; 
+    box-shadow: var(--shadow); 
+    z-index: 10;
+    cursor: pointer;
+    border-radius: 0 0 20px 20px;
 }
-header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
-.refresh-hint { font-size: 0.6rem; opacity: 0.5; display: block; }
+header h1 { 
+    margin: 0; 
+    font-size: 0.9rem; 
+    letter-spacing: 1px; 
+    font-weight: 500;
+}
+.refresh-hint { 
+    font-size: 0.6rem; 
+    opacity: 0.5; 
+    display: block; 
+    margin-top: 2px;
+}
 
-#content-wrapper { height: calc(100vh - 60px); overflow-y: auto; padding: 20px; box-sizing: border-box; }
+/* --- 內容容器 --- */
+#content-wrapper { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 20px 20px 100px 20px; /* 底部預留空間給 FAB */
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* iOS 流暢滾動 */
+}
 
-/* 右下角懸浮導覽列 */
+.page-title { 
+    text-align: center; 
+    color: var(--primary); 
+    font-size: 1.1rem; 
+    margin-bottom: 20px; 
+}
+
+/* --- 卡片與列表通用樣式 --- */
+.card, .list-item, .schedule-info, .total-box { 
+    background: var(--card-bg); 
+    padding: 20px; 
+    border-radius: 20px; 
+    box-shadow: var(--shadow); 
+    margin-bottom: 15px; 
+    transition: transform 0.2s;
+}
+
+/* --- 清單項目 --- */
+.list-item { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    border-left: 8px solid var(--primary); 
+}
+.list-item.done { 
+    opacity: 0.35; 
+    filter: grayscale(1); 
+    text-decoration: line-through;
+}
+
+/* --- 首頁機票/資訊區塊 --- */
+.quick-info-box {
+    margin-top: 20px;
+    text-align: left;
+    background: var(--bg);
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px dashed var(--primary);
+}
+.info-item { margin-bottom: 12px; }
+.info-item:last-child { margin-bottom: 0; }
+.info-label { font-size: 0.75rem; font-weight: bold; color: var(--primary); display: block; }
+.info-val { font-size: 0.88rem; margin-top: 2px; }
+.info-memo { font-size: 0.7rem; color: var(--accent); margin-top: 2px; }
+
+/* --- 行程：飯店卡片 --- */
+.hotel-card {
+    background: var(--secondary);
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 4px 12px rgba(255, 158, 125, 0.1);
+}
+.hotel-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+.hotel-name { font-size: 0.95rem; font-weight: 500; }
+.hotel-addr { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; line-height: 1.3; }
+
+/* --- 行程：分頁按鈕 --- */
+.day-tabs { 
+    display: flex; 
+    gap: 8px; 
+    overflow-x: auto; 
+    padding-bottom: 15px; 
+    scrollbar-width: none; 
+}
+.day-tabs::-webkit-scrollbar { display: none; }
+.day-tabs button { 
+    min-width: 75px; 
+    padding: 8px; 
+    border-radius: 12px; 
+    border: none; 
+    background: var(--card-bg); 
+    color: var(--subtext); 
+    font-size: 0.8rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.day-tabs button.active { 
+    background: var(--secondary); 
+    border: 1px solid var(--accent); 
+    color: var(--text); 
+    font-weight: 500;
+}
+.tab-date { font-size: 0.7rem; opacity: 0.7; font-weight: normal; }
+
+/* --- 天氣與時間軸 --- */
+.weather-box { 
+    background: linear-gradient(135deg, #a7e5e6, var(--primary));
+    color: white; 
+    padding: 12px; 
+    border-radius: 15px; 
+    margin-bottom: 20px; 
+    text-align: center; 
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
+.time-tag { color: var(--primary); font-weight: 600; min-width: 45px; font-size: 0.85rem; padding-top: 15px; text-align: center; }
+.schedule-info { flex: 1; border-left: 5px solid var(--primary); }
+.schedule-title { font-weight: 500; font-size: 1rem; margin-bottom: 5px; }
+.schedule-memo { font-size: 0.85rem; color: var(--subtext); line-height: 1.5; }
+
+/* --- 連結按鈕 --- */
+.map-link, .map-link-mini { 
+    font-size: 0.75rem; 
+    color: var(--accent); 
+    border: 1.2px solid var(--accent); 
+    padding: 4px 10px; 
+    border-radius: 20px; 
+    text-decoration: none; 
+    display: inline-block; 
+    margin-top: 8px;
+    background: transparent;
+    transition: 0.2s;
+}
+.map-link-mini { background: var(--card-bg); border-color: transparent; margin-top: 10px; }
+
+/* --- 右下角懸浮選單 (FAB) --- */
 #fab-nav {
     position: fixed;
     right: 20px;
-    bottom: calc(30px + env(safe-area-inset-bottom)); /* 避開 iPhone 底部橫條 */
+    bottom: calc(25px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     z-index: 1000;
 }
 
-/* 觸發按鈕 (圓鈕) */
 .fab-trigger {
     width: 55px; height: 55px; border-radius: 50%;
     background: var(--primary); color: white; border: none;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    font-size: 1.5rem; cursor: pointer;
+    font-size: 1.3rem; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.fab-trigger:active { transform: scale(0.9); }
 
-/* 選單內容 */
 .nav-menu {
-    background: var(--card-bg);
+    background: var(--tab-bar-bg);
+    backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 10px;
-    margin-bottom: 15px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
     border: 1px solid var(--primary);
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
     transform-origin: bottom right;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    width: 130px;
+    width: 140px;
 }
 
-/* 縮起狀態下的樣式 */
-.nav-closed .nav-menu {
-    transform: scale(0);
-    opacity: 0;
-    pointer-events: none;
-}
+.nav-closed .nav-menu { transform: scale(0); opacity: 0; pointer-events: none; }
 .nav-closed .icon-close { display: none; }
 .nav-closed .icon-open { display: block; }
 #fab-nav:not(.nav-closed) .icon-open { display: none; }
@@ -70,38 +234,19 @@ header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 
 .nav-menu button {
     border: none; background: none; padding: 12px;
-    text-align: left; color: var(--text); font-size: 0.95rem;
+    text-align: left; color: var(--text); font-size: 0.9rem;
     border-radius: 12px; display: flex; align-items: center; gap: 10px;
 }
-.nav-menu button:active { background: var(--secondary); }
-.nav-menu hr { border: none; border-top: 1px solid var(--bg); margin: 5px 0; }
-.mode-btn { color: var(--accent) !important; font-weight: bold; }
+.nav-menu hr { border: none; border-top: 1px solid rgba(0,0,0,0.05); margin: 4px 0; }
+.mode-btn { color: var(--accent) !important; font-weight: 600; }
 
-/* 其餘視覺樣式 */
-.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
-.card, .list-item, .schedule-info, .total-box { 
-    background: var(--card-bg); padding: 20px; border-radius: 20px; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; transition: 0.3s;
-}
-.list-item { border-left: 8px solid var(--primary); }
-.list-item.done { opacity: 0.3; filter: grayscale(1); }
-
-.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-.day-tabs::-webkit-scrollbar { display: none; }
-.day-tabs button { 
-    min-width: 80px; padding: 8px; border-radius: 12px; border: none; 
-    background: var(--card-bg); color: var(--subtext); font-size: 0.8rem;
-}
-.day-tabs button.active { background: var(--secondary); border: 1px solid var(--accent); color: var(--text); }
-
-.weather-box { 
-    background: linear-gradient(135deg, #a7e5e6, var(--primary));
-    color: white; padding: 15px; border-radius: 18px; margin-bottom: 20px; text-align: center; font-size: 0.85rem;
+/* --- 動畫 --- */
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
 }
 
-.schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
-.time-tag { color: var(--primary); font-weight: 500; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
-.map-link { font-size: 0.75rem; color: var(--accent); border: 1.5px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; display: inline-block; margin-top: 5px; }
-
-.fade-in { animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* --- 總計區塊 --- */
+.total-box { text-align: right; font-weight: normal; margin-top: 20px; border-left: none; border-top: 5px solid var(--accent); }
+.total-amount { color: var(--accent); font-weight: 700; font-size: 1.3rem; margin-left: 5px; }
