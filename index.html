@@ -1,162 +1,117 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vacation Journal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="light-mode">
-    <div id="app">
-        <header onclick="init()">
-            <h1 id="trip-title">載入中...</h1>
-            <span class="refresh-hint">點擊同步資料並回首頁 🔄</span>
-        </header>
+:root { 
+    --primary: #8acdd7; --secondary: #ffebcc; --accent: #ff9e7d;
+    --bg: #fffbf5; --card-bg: #ffffff; --text: #4a4a4a; --subtext: #888888;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
 
-        <div id="content-wrapper">
-            <div id="content"></div>
-        </div>
+.dark-mode {
+    --primary: #5baebc; --secondary: #3d3a35; --accent: #e58b6c;
+    --bg: #1a1c1e; --card-bg: #2d2f31; --text: #e1e2e3; --subtext: #a1a2a3;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
 
-        <button id="back-to-top" onclick="scrollToTop()">↑</button>
+body { 
+    font-family: 'Fredoka', 'Noto Sans TC', sans-serif; 
+    margin: 0; background: var(--bg); color: var(--text); 
+    transition: background 0.3s; overflow: hidden; 
+}
 
-        <nav id="fab-nav" class="nav-closed">
-            <div class="nav-menu">
-                <button onclick="changePage('home')">🏠 <span>首頁</span></button>
-                <button onclick="changePage('notes')">🚩 <span>準備</span></button>
-                <button onclick="changePage('schedule')">🗺️ <span>行程</span></button>
-                <button onclick="changePage('gifts')">🛍️ <span>伴手</span></button>
-                <button onclick="changePage('expenses')">💰 <span>花費</span></button>
-                <hr>
-                <button class="mode-btn" onclick="toggleTheme()">🌓 <span>切換模式</span></button>
-            </div>
-            <button class="fab-trigger" onclick="toggleNav()">
-                <span class="icon-open">☰</span>
-                <span class="icon-close">✕</span>
-            </button>
-        </nav>
-    </div>
+#app { display: flex; flex-direction: column; height: 100vh; }
 
-    <script>
-        let db = {};
-        let currentDayIdx = 0;
-        let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
-        
-        const wrapper = document.getElementById('content-wrapper');
-        const bttBtn = document.getElementById('back-to-top');
+header { 
+    background: var(--card-bg); color: var(--primary); padding: 15px; 
+    text-align: center; box-shadow: var(--shadow); cursor: pointer; z-index: 10;
+}
+header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
+.refresh-hint { font-size: 0.6rem; opacity: 0.5; display: block; }
 
-        if (localStorage.getItem('theme') === 'dark') document.body.className = 'dark-mode';
+/* 滾動內容區優化 */
+#content-wrapper { 
+    flex: 1; 
+    overflow-y: scroll; 
+    -webkit-overflow-scrolling: touch; 
+    padding: 20px 20px 120px 20px; 
+    box-sizing: border-box;
+    overscroll-behavior-y: contain;
+}
 
-        // 監聽滾動顯示回頂按鈕
-        wrapper.onscroll = function() {
-            if (wrapper.scrollTop > 300) bttBtn.classList.add('show');
-            else bttBtn.classList.remove('show');
-        };
+#content-wrapper::-webkit-scrollbar { width: 4px; }
+#content-wrapper::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
-        function scrollToTop() {
-            wrapper.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+/* 元件樣式 */
+.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
+.card, .list-item, .schedule-info, .total-box { 
+    background: var(--card-bg); padding: 20px; border-radius: 20px; 
+    box-shadow: var(--shadow); margin-bottom: 15px; 
+}
+.list-item { border-left: 8px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
+.list-item.done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
 
-        async function init() {
-            const cacheBuster = new Date().getTime();
-            try {
-                const res = await fetch(`data.json?t=${cacheBuster}`, { cache: "no-store" });
-                db = await res.json();
-                document.getElementById('trip-title').innerText = db.trip_name;
-                changePage('home');
-            } catch (e) { console.error("Update failed"); }
-        }
+/* 首頁資訊 */
+.quick-info-box {
+    margin-top: 20px; text-align: left; background: var(--bg); 
+    border-radius: 15px; padding: 15px; border: 1px dashed var(--primary);
+}
+.info-label { font-size: 0.7rem; font-weight: bold; color: var(--primary); display: block; }
+.info-val { font-size: 0.85rem; margin-top: 2px; }
 
-        function toggleNav() {
-            document.getElementById('fab-nav').classList.toggle('nav-closed');
-        }
+/* 住宿卡片 */
+.hotel-card {
+    background: var(--secondary); border-radius: 18px; padding: 15px;
+    margin-bottom: 20px; border: 1.5px solid var(--accent);
+}
+.hotel-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
+.hotel-name { font-size: 0.95rem; font-weight: 500; }
+.hotel-addr { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
 
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
+/* 行程分頁 */
+.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+.day-tabs button { 
+    min-width: 75px; padding: 8px; border-radius: 12px; border: none; 
+    background: var(--card-bg); color: var(--subtext); font-size: 0.8rem;
+}
+.day-tabs button.active { background: var(--secondary); border: 1px solid var(--accent); color: var(--text); font-weight: 500; }
 
-        function toggleCheck(id) {
-            checkedItems[id] = !checkedItems[id];
-            localStorage.setItem('trip_checked', JSON.stringify(checkedItems));
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle('done', checkedItems[id]);
-        }
+/* 天氣 */
+.weather-box { 
+    background: linear-gradient(135deg, #a7e5e6, var(--primary));
+    color: white; padding: 12px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-size: 0.85rem;
+}
 
-        async function fetchWeather(location, date) {
-            try {
-                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`);
-                const geoData = await geoRes.json();
-                const { lat, lon } = geoData[0];
-                const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto&start_date=${date}&end_date=${date}`);
-                const wData = await wRes.json();
-                const code = wData.daily.weathercode[0];
-                const max = Math.round(wData.daily.temperature_2m_max[0]);
-                const min = Math.round(wData.daily.temperature_2m_min[0]);
-                const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
-                return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
-            } catch (e) { return "☁️ 天氣更新中..."; }
-        }
+/* 時間軸 */
+.schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
+.time-tag { color: var(--primary); font-weight: 600; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
+.map-link, .map-link-mini { font-size: 0.7rem; color: var(--accent); border: 1px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; margin-top: 5px; display: inline-block; }
+.map-link-mini { background: var(--card-bg); border-color: transparent; }
 
-        async function renderSchedule() {
-            const container = document.getElementById('content');
-            const dayData = db.schedule[currentDayIdx];
-            
-            let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => {
-                const dateObj = new Date(d.date);
-                return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}<br><span class="tab-date">${dateObj.getMonth()+1}/${dateObj.getDate()}</span></button>`;
-            }).join('') + `</div>`;
+/* 回到頂部按鈕 */
+#back-to-top {
+    position: fixed; right: 25px; bottom: calc(100px + env(safe-area-inset-bottom));
+    width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg);
+    color: var(--primary); border: 1px solid var(--primary); box-shadow: var(--shadow);
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    z-index: 999; opacity: 0; transform: translateY(20px); transition: 0.3s; pointer-events: none;
+}
+#back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-            const hotelHtml = dayData.hotel ? `
-                <div class="hotel-card">
-                    <div class="hotel-header">🏨 今日下榻飯店</div>
-                    <div class="hotel-name">${dayData.hotel.name}</div>
-                    <div class="hotel-addr">${dayData.hotel.address}</div>
-                    ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">開啟地圖導航</a>` : ''}
-                </div>` : '';
+/* FAB 選單 */
+#fab-nav {
+    position: fixed; right: 20px; bottom: calc(25px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; align-items: flex-end; z-index: 1000;
+}
+.fab-trigger {
+    width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: white; border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.3rem; display: flex; align-items: center; justify-content: center; transition: 0.3s;
+}
+.nav-menu {
+    background: var(--card-bg); border-radius: 20px; padding: 10px; margin-bottom: 12px;
+    box-shadow: var(--shadow); border: 1px solid var(--primary);
+    display: flex; flex-direction: column; gap: 4px; transform-origin: bottom right; transition: 0.3s; width: 130px;
+}
+.nav-closed .nav-menu { transform: scale(0); opacity: 0; pointer-events: none; }
+.nav-closed .icon-close, #fab-nav:not(.nav-closed) .icon-open { display: none; }
+.nav-menu button { border: none; background: none; padding: 12px; text-align: left; color: var(--text); font-size: 0.9rem; display: flex; gap: 10px; }
+.mode-btn { color: var(--accent) !important; font-weight: 600; }
 
-            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div>${hotelHtml}<div id="schedule-list"></div>`;
-            fetchWeather(dayData.location, dayData.date).then(info => { document.getElementById('weather-box').innerText = info; });
-            document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
-                <div class="schedule-item">
-                    <div class="time-tag">${item.time}</div>
-                    <div class="schedule-info">
-                        <div class="schedule-title">${item.content}</div>
-                        ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
-                        ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 地點詳情</a>` : ''}
-                    </div>
-                </div>`).join('');
-            wrapper.scrollTo(0, 0);
-        }
-
-        function changePage(page) {
-            const container = document.getElementById('content');
-            container.classList.remove('fade-in');
-            void container.offsetWidth;
-            container.classList.add('fade-in');
-            
-            document.getElementById('fab-nav').classList.add('nav-closed');
-
-            if(page === 'schedule') renderSchedule();
-            else if(page === 'notes' || page === 'gifts') {
-                const list = page === 'notes' ? db.notes : db.gifts;
-                container.innerHTML = `<h2 class="page-title">${page==='notes'?'🚩 準備清單':'🛍️ 伴手禮'}</h2>` + 
-                    list.map((item, i) => `<div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">${item}</div>`).join('');
-            }
-            else if(page === 'home') {
-                const flightHtml = db.flights ? db.flights.map(f => `<div class="info-item"><span class="info-label">✈️ ${f.type}</span><div class="info-val">${f.info}</div></div>`).join('') : '';
-                container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div><p style="margin-top:20px; font-size:0.75rem; opacity:0.4;">Have a nice trip!</p></div>`;
-            }
-            else if(page === 'expenses') {
-                let total = 0;
-                container.innerHTML = `<h2 class="page-title">💰 花費預算</h2>` + db.expenses.map((e, i) => {
-                    total += parseInt(e.cost);
-                    return `<div class="list-item ${checkedItems['exp-'+i]?'done':''}" id="exp-${i}" onclick="toggleCheck('exp-${i}')"><span>${e.item}</span><span class="cost">$${e.cost}</span></div>`;
-                }).join('') + `<div class="total-box">總計：<span class="total-amount">$${total}</span></div>`;
-            }
-            wrapper.scrollTo(0, 0);
-        }
-        init();
-    </script>
-</body>
-</html>
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
