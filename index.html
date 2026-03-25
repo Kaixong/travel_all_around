@@ -139,8 +139,38 @@
                     list.map((item, i) => `<div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">${item}</div>`).join('');
             }
             else if(page === 'home') {
-                const flightHtml = db.flights ? db.flights.map(f => `<div class="info-item"><span class="info-label">✈️ ${f.type}</span><div class="info-val">${f.info}</div></div>`).join('') : '';
-                container.innerHTML = `<div class="card home-card"><div class="icon">🌴</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div></div>`;
+                const flightHtml = db.flights ? db.flights.map(f => `
+                    <div class="ticket">
+                        <div class="ticket-header">
+                            <span class="ticket-type">${f.type}</span>
+                            <span class="flight-no">${f.no}</span>
+                        </div>
+                        <div class="ticket-body">
+                            <div class="station">
+                                <div class="code">${f.from_code}</div>
+                                <div class="city">${f.from}</div>
+                            </div>
+                            <div class="flight-icon">✈️</div>
+                            <div class="station" style="text-align: right;">
+                                <div class="code">${f.to_code}</div>
+                                <div class="city">${f.to}</div>
+                            </div>
+                        </div>
+                        <div class="ticket-footer">
+                            <div class="time">🕒 ${f.time}</div>
+                            ${f.memo ? `<div class="memo">${f.memo}</div>` : ''}
+                        </div>
+                    </div>`).join('') : '';
+            
+                container.innerHTML = `
+                    <div class="home-hero">
+                        <div class="hero-icon">🌴</div>
+                        <h2 class="hero-title">${db.destination}</h2>
+                        <p class="hero-date">${db.date}</p>
+                    </div>
+                    <div class="section-label">航班資訊</div>
+                    ${flightHtml}
+                `;
             }
             else if(page === 'expenses') {
                 let total = 0;
