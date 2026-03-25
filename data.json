@@ -1,23 +1,28 @@
 {
-  "trip_name": "福州三日遊",
+  "trip_name": "福州三日遊 (範例)",
   "destination": "福州",
-  "date": "2026-03-27",
-  "notes": ["台胞證", "支付寶", "漫遊"],
+  "date": "2026-03-27 ~ 2026-03-29",
+  "notes": [
+    "台胞證 (正本)",
+    "支付寶 / 微信支付確認",
+    "中港澳網卡 / 漫遊",
+    "馬祖小三通船票預約"
+  ],
   "schedule": [
     {
       "day": 1,
       "items": [
         {
           "time": "09:00",
-          "content": "馬祖南竿碼頭取票",
-          "link": "https://maps.app.goo.gl/XXXXX",
-          "memo": "提早30分鐘抵達"
+          "content": "馬祖南竿碼頭",
+          "link": "https://maps.app.goo.gl/XYZ123",
+          "memo": "提早 30 分鐘現場取票"
         },
         {
           "time": "14:00",
-          "content": "三坊七巷散步",
-          "link": "https://maps.app.goo.gl/YYYYY",
-          "memo": "必拍愛心樹，試試茉莉花茶"
+          "content": "三坊七巷",
+          "link": "https://maps.app.goo.gl/ABC456",
+          "memo": "必拍愛心樹，推薦試試茉莉花茶"
         }
       ]
     },
@@ -26,15 +31,22 @@
       "items": [
         {
           "time": "10:00",
-          "content": "煙台山公園攝影",
-          "link": "",
-          "memo": "很多歐式老建築"
+          "content": "煙台山歷史風貌區",
+          "link": "https://maps.app.goo.gl/DEF789",
+          "memo": "歐式建築攝影聖地"
         }
       ]
     }
   ],
-  "gifts": ["茉莉花茶"],
+  "gifts": [
+    "茉莉花茶",
+    "福州脫胎漆器",
+    "橄欖",
+    "同利肉燕"
+  ],
   "expenses": [
-    {"item": "船票", "cost": "1500"}
+    {"item": "來回船票", "cost": "1500"},
+    {"item": "飯店 (兩晚)", "cost": "3200"},
+    {"item": "預備金", "cost": "5000"}
   ]
 }
