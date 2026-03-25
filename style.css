@@ -1,73 +1,95 @@
 :root { 
-    --primary: #8acdd7;
-    --secondary: #ffebcc;
-    --accent: #ff9e7d;
-    --bg: #fffbf5;
-    --card-bg: #ffffff;
-    --text: #4a4a4a;
-    --subtext: #888888;
+    --primary: #8acdd7; --secondary: #ffebcc; --accent: #ff9e7d;
+    --bg: #fffbf5; --card-bg: #ffffff; --text: #4a4a4a; --subtext: #888888;
 }
 
 .dark-mode {
-    --primary: #5baebc;
-    --secondary: #4a3f2f;
-    --accent: #e58b6c;
-    --bg: #1a1c1e;
-    --card-bg: #2d2f31;
-    --text: #e1e2e3;
-    --subtext: #a1a2a3;
+    --primary: #5baebc; --secondary: #4a3f2f; --accent: #e58b6c;
+    --bg: #1a1c1e; --card-bg: #2d2f31; --text: #e1e2e3; --subtext: #a1a2a3;
 }
 
 body { font-family: 'Fredoka', 'Noto Sans TC', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; overflow: hidden; }
 
-/* 迷你標題：點擊區域 */
 header { 
     background: var(--card-bg); color: var(--primary); padding: 15px; 
     text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer;
-    position: relative; z-index: 5;
 }
-header h1 { margin: 0; font-size: 1rem; }
+header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 .refresh-hint { font-size: 0.6rem; opacity: 0.5; display: block; }
 
-/* 左側懸浮選單 */
-#side-nav {
-    position: fixed; left: 15px; top: 70px; /* 避開 header */
-    width: 140px; background: var(--card-bg);
-    border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    z-index: 100; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    overflow: hidden; border: 1px solid var(--primary);
-}
-#side-nav.nav-closed { width: 45px; height: 45px; border-radius: 50%; border-color: transparent; }
-
-.toggle-nav {
-    width: 45px; height: 45px; border: none; background: var(--primary);
-    color: white; font-size: 1.2rem; cursor: pointer; border-radius: 50%;
-}
-
-.nav-links { padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-.nav-links button {
-    border: none; background: none; padding: 12px 10px; text-align: left;
-    color: var(--text); font-size: 0.9rem; border-radius: 10px; transition: 0.2s;
-}
-.nav-links button:active { background: var(--secondary); }
-.nav-links hr { border: 0.5px solid var(--bg); margin: 5px 0; }
-.mode-btn { color: var(--accent) !important; font-weight: bold; }
-
-/* 內容區塊：不再被導覽列遮擋 */
 #content-wrapper { height: calc(100vh - 60px); overflow-y: auto; padding: 20px; box-sizing: border-box; }
 
-/* 其餘樣式 (保持度假風) */
-.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; }
+/* 右下角懸浮導覽列 */
+#fab-nav {
+    position: fixed;
+    right: 20px;
+    bottom: calc(30px + env(safe-area-inset-bottom)); /* 避開 iPhone 底部橫條 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+/* 觸發按鈕 (圓鈕) */
+.fab-trigger {
+    width: 55px; height: 55px; border-radius: 50%;
+    background: var(--primary); color: white; border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-size: 1.5rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.fab-trigger:active { transform: scale(0.9); }
+
+/* 選單內容 */
+.nav-menu {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border: 1px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transform-origin: bottom right;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 130px;
+}
+
+/* 縮起狀態下的樣式 */
+.nav-closed .nav-menu {
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+}
+.nav-closed .icon-close { display: none; }
+.nav-closed .icon-open { display: block; }
+#fab-nav:not(.nav-closed) .icon-open { display: none; }
+#fab-nav:not(.nav-closed) .icon-close { display: block; }
+
+.nav-menu button {
+    border: none; background: none; padding: 12px;
+    text-align: left; color: var(--text); font-size: 0.95rem;
+    border-radius: 12px; display: flex; align-items: center; gap: 10px;
+}
+.nav-menu button:active { background: var(--secondary); }
+.nav-menu hr { border: none; border-top: 1px solid var(--bg); margin: 5px 0; }
+.mode-btn { color: var(--accent) !important; font-weight: bold; }
+
+/* 其餘視覺樣式 */
+.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
 .card, .list-item, .schedule-info, .total-box { 
     background: var(--card-bg); padding: 20px; border-radius: 20px; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 15px; transition: 0.3s;
 }
-.list-item { border-left: 8px solid var(--primary); display: flex; justify-content: space-between; }
+.list-item { border-left: 8px solid var(--primary); }
 .list-item.done { opacity: 0.3; filter: grayscale(1); }
 
-.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
+.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+.day-tabs::-webkit-scrollbar { display: none; }
 .day-tabs button { 
-    min-width: 75px; padding: 8px; border-radius: 12px; border: none; 
+    min-width: 80px; padding: 8px; border-radius: 12px; border: none; 
     background: var(--card-bg); color: var(--subtext); font-size: 0.8rem;
 }
 .day-tabs button.active { background: var(--secondary); border: 1px solid var(--accent); color: var(--text); }
@@ -79,7 +101,7 @@ header h1 { margin: 0; font-size: 1rem; }
 
 .schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
 .time-tag { color: var(--primary); font-weight: 500; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
-.map-link { font-size: 0.75rem; color: var(--accent); border: 1.5px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; }
+.map-link { font-size: 0.75rem; color: var(--accent); border: 1.5px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; display: inline-block; margin-top: 5px; }
 
 .fade-in { animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
