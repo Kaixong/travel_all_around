@@ -10,8 +10,8 @@
 <body class="light-mode">
     <div id="app">
         <header onclick="init()">
-            <h1 id="trip-title">載入中...</h1>
-            <span class="refresh-hint">點擊同步資料回首頁 🔄</span>
+            <h1 id="page-title-display">載入中...</h1>
+            <span class="refresh-hint" id="trip-date-hint">Syncing...</span>
         </header>
 
         <main id="content" class="fade-in"></main>
@@ -26,7 +26,7 @@
                 <button onclick="changePage('gifts')">🛍️ <span>伴手</span></button>
                 <button onclick="changePage('expenses')">💰 <span>花費</span></button>
                 <hr>
-                <button class="mode-btn" onclick="toggleTheme()">🌓 <span>切換模式</span></button>
+                <button class="mode-btn" onclick="toggleTheme()">🌓 <span>模式</span></button>
             </div>
             <button class="fab-trigger" onclick="toggleNav()">
                 <span class="icon-open">☰</span>
@@ -42,30 +42,24 @@
 
         if (localStorage.getItem('theme') === 'dark') document.body.className = 'dark-mode';
 
-        // 監聽全域滾動
         window.onscroll = function() {
             const bttBtn = document.getElementById('back-to-top');
             if (window.scrollY > 300) bttBtn.classList.add('show');
             else bttBtn.classList.remove('show');
         };
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
         async function init() {
             const cacheBuster = new Date().getTime();
             try {
                 const res = await fetch(`data.json?t=${cacheBuster}`, { cache: "no-store" });
                 db = await res.json();
-                document.getElementById('trip-title').innerText = db.trip_name;
                 changePage('home');
             } catch (e) { console.error("Update failed"); }
         }
 
-        function toggleNav() {
-            document.getElementById('fab-nav').classList.toggle('nav-closed');
-        }
+        function toggleNav() { document.getElementById('fab-nav').classList.toggle('nav-closed'); }
 
         function toggleTheme() {
             const isDark = document.body.classList.toggle('dark-mode');
@@ -89,7 +83,7 @@
                 const code = wData.daily.weathercode[0];
                 const max = Math.round(wData.daily.temperature_2m_max[0]);
                 const min = Math.round(wData.daily.temperature_2m_min[0]);
-                const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
+                const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
                 return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
             } catch (e) { return "☁️ 天氣同步中..."; }
         }
@@ -97,21 +91,22 @@
         async function renderSchedule() {
             const container = document.getElementById('content');
             const dayData = db.schedule[currentDayIdx];
+            document.getElementById('page-title-display').innerText = `Day ${dayData.day} - ${dayData.location}`;
+            document.getElementById('trip-date-hint').innerText = dayData.date;
             
             let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => {
                 const dateObj = new Date(d.date);
-                return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}<br><span class="tab-date">${dateObj.getMonth()+1}/${dateObj.getDate()}</span></button>`;
+                return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">D${d.day}</button>`;
             }).join('') + `</div>`;
 
             const hotelHtml = dayData.hotel ? `
                 <div class="hotel-card">
-                    <div class="hotel-header">🏨 今日下榻飯店</div>
+                    <div class="hotel-header">🏨 HOTEL</div>
                     <div class="hotel-name">${dayData.hotel.name}</div>
-                    <div class="hotel-addr">${dayData.hotel.address}</div>
-                    ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">開啟導航</a>` : ''}
+                    ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">地圖導航</a>` : ''}
                 </div>` : '';
 
-            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div>${hotelHtml}<div id="schedule-list"></div>`;
+            container.innerHTML = `${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div>${hotelHtml}<div id="schedule-list"></div>`;
             fetchWeather(dayData.location, dayData.date).then(info => { document.getElementById('weather-box').innerText = info; });
             document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
                 <div class="schedule-item">
@@ -119,7 +114,7 @@
                     <div class="schedule-info">
                         <div class="schedule-title">${item.content}</div>
                         ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
-                        ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 地點詳情</a>` : ''}
+                        ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 地點</a>` : ''}
                     </div>
                 </div>`).join('');
             window.scrollTo(0, 0);
@@ -132,51 +127,43 @@
             container.classList.add('fade-in');
             document.getElementById('fab-nav').classList.add('nav-closed');
 
-            if(page === 'schedule') renderSchedule();
-            else if(page === 'notes' || page === 'gifts') {
-                const list = page === 'notes' ? db.notes : db.gifts;
-                container.innerHTML = `<h2 class="page-title">${page==='notes'?'🚩 準備清單':'🛍️ 伴手禮'}</h2>` + 
-                    list.map((item, i) => `<div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">${item}</div>`).join('');
-            }
-            else if(page === 'home') {
-                const flightHtml = db.flights ? db.flights.map(f => `
+            if(page === 'schedule') {
+                renderSchedule();
+            } else if(page === 'notes' || page === 'gifts') {
+                const isNote = page === 'notes';
+                document.getElementById('page-title-display').innerText = isNote ? '🚩 準備清單' : '🛍️ 伴手禮';
+                document.getElementById('trip-date-hint').innerText = isNote ? 'Before Departure' : 'Shopping List';
+                const list = isNote ? db.notes : db.gifts;
+                container.innerHTML = list.map((item, i) => `
+                    <div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">
+                        <div class="checkbox"></div>
+                        <span class="list-text">${item}</span>
+                    </div>`).join('');
+            } else if(page === 'home') {
+                document.getElementById('page-title-display').innerText = db.trip_name;
+                document.getElementById('trip-date-hint').innerText = db.date;
+                const flightHtml = db.flights.map(f => `
                     <div class="ticket">
-                        <div class="ticket-header">
-                            <span class="ticket-type">${f.type}</span>
-                            <span class="flight-no">${f.no}</span>
-                        </div>
+                        <div class="ticket-header"><span>${f.type}</span><span>${f.no}</span></div>
                         <div class="ticket-body">
-                            <div class="station">
-                                <div class="code">${f.from_code}</div>
-                                <div class="city">${f.from}</div>
-                            </div>
+                            <div class="station"><div class="code">${f.from_code}</div><div class="city">${f.from}</div></div>
                             <div class="flight-icon">✈️</div>
-                            <div class="station" style="text-align: right;">
-                                <div class="code">${f.to_code}</div>
-                                <div class="city">${f.to}</div>
-                            </div>
+                            <div class="station" style="text-align:right"><div class="code">${f.to_code}</div><div class="city">${f.to}</div></div>
                         </div>
-                        <div class="ticket-footer">
-                            <div class="time">🕒 ${f.time}</div>
-                            ${f.memo ? `<div class="memo">${f.memo}</div>` : ''}
-                        </div>
-                    </div>`).join('') : '';
-            
-                container.innerHTML = `
-                    <div class="home-hero">
-                        <div class="hero-icon">🌴</div>
-                        <h2 class="hero-title">${db.destination}</h2>
-                        <p class="hero-date">${db.date}</p>
-                    </div>
-                    <div class="section-label">航班資訊</div>
-                    ${flightHtml}
-                `;
-            }
-            else if(page === 'expenses') {
+                        <div class="ticket-footer"><div class="time">🕒 ${f.time}</div><div class="memo">${f.memo}</div></div>
+                    </div>`).join('');
+                container.innerHTML = `<div class="home-hero"><div class="hero-icon">🌴</div><h2 class="hero-title">${db.destination}</h2></div><div class="section-label">航班資訊</div>${flightHtml}`;
+            } else if(page === 'expenses') {
+                document.getElementById('page-title-display').innerText = '💰 花費預算';
+                document.getElementById('trip-date-hint').innerText = 'Budget Tracking';
                 let total = 0;
-                container.innerHTML = `<h2 class="page-title">💰 花費預算</h2>` + db.expenses.map((e, i) => {
+                container.innerHTML = db.expenses.map((e, i) => {
                     total += parseInt(e.cost);
-                    return `<div class="list-item ${checkedItems['exp-'+i]?'done':''}" id="exp-${i}" onclick="toggleCheck('exp-${i}')"><span>${e.item}</span><span class="cost">$${e.cost}</span></div>`;
+                    return `<div class="list-item ${checkedItems['exp-'+i]?'done':''}" id="exp-${i}" onclick="toggleCheck('exp-${i}')">
+                        <div class="checkbox"></div>
+                        <span class="list-text">${e.item}</span>
+                        <span class="cost">$${e.cost}</span>
+                    </div>`;
                 }).join('') + `<div class="total-box">總計：<span class="total-amount">$${total}</span></div>`;
             }
             window.scrollTo(0, 0);
