@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旅遊手冊 Pro</title>
+    <title>旅遊手冊</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <header>
             <h1 id="trip-title">載入中...</h1>
-            <div id="sub-header"></div>
+            <div id="trip-date"></div>
         </header>
 
         <div id="content-wrapper">
-            <div id="content" class="fade-in">
+            <div id="content">
                 </div>
         </div>
 
@@ -32,7 +32,7 @@
         let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
 
         async function init() {
-            // 加上 ?t=時間戳記，強制繞過 GitHub Pages 的快取
+            // 強制更新機制：加上時間戳記繞過快取
             const res = await fetch('data.json?t=' + new Date().getTime());
             db = await res.json();
             document.getElementById('trip-title').innerText = db.trip_name;
@@ -50,22 +50,26 @@
 
         function changePage(page) {
             const container = document.getElementById('content');
-            const subHeader = document.getElementById('sub-header');
             
-            // 觸發切換動畫
+            // 觸發淡入動畫
             container.classList.remove('fade-in');
-            void container.offsetWidth; // 強制重繪
+            void container.offsetWidth; 
             container.classList.add('fade-in');
 
             let html = "";
-            subHeader.innerHTML = ""; // 清空副標題
 
             if(page === 'home') {
-                html = `<div class="card"><h2>${db.destination}</h2><p>日期：${db.date}</p><p>準備好出發了嗎？</p></div>`;
+                html = `
+                    <div class="card home-card">
+                        <div class="icon">✈️</div>
+                        <h2>${db.destination}</h2>
+                        <p>行程準備就緒</p>
+                        <p style="font-size: 0.9em; color: #888;">點擊下方導覽切換分頁</p>
+                    </div>`;
             } 
             else if(page === 'notes' || page === 'gifts') {
                 const list = page === 'notes' ? db.notes : db.gifts;
-                html = `<h2>${page==='notes'?'注意事項':'必買清單'}</h2>`;
+                html = `<h2>${page==='notes'?'🚩 注意事項':'🛍️ 必買清單'}</h2>`;
                 html += list.map((item, i) => {
                     const id = `${page}-${i}`;
                     const isDone = checkedItems[id] ? 'done' : '';
@@ -73,11 +77,10 @@
                 }).join('');
             } 
             else if(page === 'schedule') {
-                html = `<h2>詳細行程</h2>`;
+                html = `<h2>🗺️ 詳細行程</h2>`;
                 db.schedule.forEach(dayGroup => {
                     html += `<div class="day-section">
                                 <div class="day-header">Day ${dayGroup.day}</div>`;
-                    
                     dayGroup.items.forEach(item => {
                         html += `
                             <div class="schedule-item">
@@ -87,16 +90,14 @@
                                     ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
                                     ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 查看地圖</a>` : ''}
                                 </div>
-                            </div>
-                        `;
+                            </div>`;
                     });
-                    
                     html += `</div>`;
                 });
-            }
+            } 
             else if(page === 'expenses') {
                 let total = 0;
-                html = `<h2>開銷明細</h2>`;
+                html = `<h2>💰 開銷明細</h2>`;
                 html += db.expenses.map((e, i) => {
                     const id = `exp-${i}`;
                     const isDone = checkedItems[id] ? 'done' : '';
@@ -105,10 +106,11 @@
                                 <span>${e.item}</span><span>$${e.cost}</span>
                             </div>`;
                 }).join('');
-                html += `<div class="total">總計：$${total}</div>`;
+                html += `<div class="total">總計預算：$${total}</div>`;
             }
             
             container.innerHTML = html;
+            document.getElementById('content-wrapper').scrollTo(0, 0);
         }
 
         init();
