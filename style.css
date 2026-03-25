@@ -1,52 +1,84 @@
-:root { --primary: #2a9d8f; --secondary: #e9c46a; --bg: #f8f9fa; }
+:root { 
+    --primary: #2a9d8f; 
+    --secondary: #e9c46a; 
+    --bg: #f8f9fa; 
+}
+
 body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); overflow: hidden; }
 #app { display: flex; flex-direction: column; height: 100vh; }
-header { background: var(--primary); color: white; padding: 15px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-header h1 { margin: 0; font-size: 1.1rem; }
-#trip-date { font-size: 0.7rem; opacity: 0.8; margin-top: 4px; }
-#content-wrapper { flex: 1; overflow-y: auto; padding: 15px 15px 100px 15px; }
+
+/* 標題調整：增加上下內距，讓文字更往中心靠 */
+header { 
+    background: var(--primary); 
+    color: white; 
+    padding: 25px 20px; /* 增加上下高度 */
+    text-align: center; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    z-index: 10;
+}
+header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1.5px; }
+#trip-date { font-size: 0.8rem; opacity: 0.8; margin-top: 8px; }
+
+#content-wrapper { flex: 1; overflow-y: auto; padding: 20px 20px 120px 20px; }
 
 .fade-in { animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* 清單勾選 */
 .list-item { 
-    background: white; padding: 15px; margin-bottom: 10px; border-radius: 12px;
+    background: white; padding: 18px; margin-bottom: 12px; border-radius: 12px;
     display: flex; justify-content: space-between; align-items: center;
-    border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-left: 6px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 .list-item.done { text-decoration: line-through; opacity: 0.4; background: #eee; border-left-color: #bbb; }
 
-/* 行程分頁按鈕 */
-.day-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+/* 行程分頁按鈕：微調高度以容納兩行文字 */
+.day-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding: 5px 0; }
 .day-tabs::-webkit-scrollbar { display: none; }
 .day-tabs button { 
-    min-width: 80px; padding: 10px; border-radius: 10px; border: 1px solid #ddd; 
-    background: white; font-weight: bold; color: #666; 
+    min-width: 85px; padding: 8px 10px; border-radius: 12px; border: 1.5px solid #ddd; 
+    background: white; font-weight: bold; color: #666; line-height: 1.2;
 }
 .day-tabs button.active { background: var(--secondary); border-color: var(--secondary); color: #5c4d2d; }
 
 /* 天氣區塊 */
 .weather-box { 
-    background: #eefaf9; color: var(--primary); padding: 12px; border-radius: 10px;
-    margin-bottom: 20px; font-size: 0.85rem; border: 1px dashed var(--primary); text-align: center;
+    background: #eefaf9; color: var(--primary); padding: 14px; border-radius: 12px;
+    margin-bottom: 25px; font-size: 0.85rem; border: 1px dashed var(--primary); text-align: center;
 }
 
 /* 行程項目 */
-.schedule-item { display: flex; gap: 10px; margin-bottom: 15px; }
-.time-tag { font-weight: bold; color: var(--primary); min-width: 45px; font-size: 0.85rem; padding-top: 12px; }
+.schedule-item { display: flex; gap: 12px; margin-bottom: 20px; }
+.time-tag { font-weight: bold; color: var(--primary); min-width: 50px; font-size: 0.9rem; padding-top: 12px; }
 .schedule-info { 
-    background: white; padding: 12px; border-radius: 12px; flex: 1;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 3px solid var(--primary);
+    background: white; padding: 15px; border-radius: 12px; flex: 1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--primary);
 }
-.schedule-title { font-weight: bold; font-size: 0.95rem; margin-bottom: 4px; }
-.schedule-memo { font-size: 0.8rem; color: #777; margin-bottom: 8px; }
-.map-link { font-size: 0.75rem; color: var(--primary); text-decoration: none; border: 1px solid var(--primary); padding: 3px 8px; border-radius: 6px; }
+.schedule-title { font-weight: bold; font-size: 1rem; margin-bottom: 6px; }
+.schedule-memo { font-size: 0.85rem; color: #777; margin-bottom: 10px; }
+.map-link { font-size: 0.75rem; color: var(--primary); text-decoration: none; border: 1.5px solid var(--primary); padding: 4px 10px; border-radius: 8px; }
 
-/* 底部選單 */
-.tab-bar { position: fixed; bottom: 0; width: 100%; display: flex; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); }
-.tab-bar button { flex: 1; padding: 18px 5px; border: none; background: none; font-size: 0.8rem; color: #777; }
+/* 底部選單：增加上下內距與安全區域支撐 */
+.tab-bar { 
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+    display: flex; 
+    background: white; 
+    box-shadow: 0 -3px 15px rgba(0,0,0,0.08); 
+    padding-top: 10px; /* 讓按鈕不要太貼頂部 */
+    padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* 增加底部空間，閃開 iPhone 橫條 */
+}
+.tab-bar button { 
+    flex: 1; 
+    padding: 10px 5px; 
+    border: none; 
+    background: none; 
+    font-size: 0.85rem; 
+    color: #888; 
+    font-weight: 500;
+}
 .tab-bar button:active { background: #f0fdfa; color: var(--primary); }
 
-.card { background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-.total { text-align: right; font-weight: bold; padding: 15px; color: #e76f51; font-size: 1.1rem; }
+.card { background: white; padding: 35px 25px; border-radius: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.total { text-align: right; font-weight: bold; padding: 20px; color: #e76f51; font-size: 1.2rem; }
