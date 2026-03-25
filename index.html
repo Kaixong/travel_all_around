@@ -11,12 +11,14 @@
     <div id="app">
         <header onclick="init()">
             <h1 id="trip-title">載入中...</h1>
-            <span class="refresh-hint">點擊同步資料 🔄</span>
+            <span class="refresh-hint">點擊同步資料並回首頁 🔄</span>
         </header>
 
         <div id="content-wrapper">
             <div id="content"></div>
         </div>
+
+        <button id="back-to-top" onclick="scrollToTop()">↑</button>
 
         <nav id="fab-nav" class="nav-closed">
             <div class="nav-menu">
@@ -40,7 +42,20 @@
         let currentDayIdx = 0;
         let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
         
+        const wrapper = document.getElementById('content-wrapper');
+        const bttBtn = document.getElementById('back-to-top');
+
         if (localStorage.getItem('theme') === 'dark') document.body.className = 'dark-mode';
+
+        // 監聽滾動顯示回頂按鈕
+        wrapper.onscroll = function() {
+            if (wrapper.scrollTop > 300) bttBtn.classList.add('show');
+            else bttBtn.classList.remove('show');
+        };
+
+        function scrollToTop() {
+            wrapper.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         async function init() {
             const cacheBuster = new Date().getTime();
@@ -80,7 +95,7 @@
                 const min = Math.round(wData.daily.temperature_2m_min[0]);
                 const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
                 return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
-            } catch (e) { return "☁️ 天氣連線中..."; }
+            } catch (e) { return "☁️ 天氣更新中..."; }
         }
 
         async function renderSchedule() {
@@ -91,8 +106,7 @@
                 const dateObj = new Date(d.date);
                 return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}<br><span class="tab-date">${dateObj.getMonth()+1}/${dateObj.getDate()}</span></button>`;
             }).join('') + `</div>`;
-        
-            // 新增飯店資訊 HTML
+
             const hotelHtml = dayData.hotel ? `
                 <div class="hotel-card">
                     <div class="hotel-header">🏨 今日下榻飯店</div>
@@ -100,16 +114,9 @@
                     <div class="hotel-addr">${dayData.hotel.address}</div>
                     ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">開啟地圖導航</a>` : ''}
                 </div>` : '';
-        
-            container.innerHTML = `
-                <h2 class="page-title">🗺️ 詳細行程</h2>
-                ${tabs}
-                <div id="weather-box" class="weather-box">正在獲取天氣...</div>
-                ${hotelHtml}
-                <div id="schedule-list"></div>`;
-            
+
+            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div>${hotelHtml}<div id="schedule-list"></div>`;
             fetchWeather(dayData.location, dayData.date).then(info => { document.getElementById('weather-box').innerText = info; });
-            
             document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
                 <div class="schedule-item">
                     <div class="time-tag">${item.time}</div>
@@ -119,6 +126,7 @@
                         ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 地點詳情</a>` : ''}
                     </div>
                 </div>`).join('');
+            wrapper.scrollTo(0, 0);
         }
 
         function changePage(page) {
@@ -136,21 +144,8 @@
                     list.map((item, i) => `<div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">${item}</div>`).join('');
             }
             else if(page === 'home') {
-                const flightHtml = db.flights ? db.flights.map(f => `
-                    <div class="info-item">
-                        <span class="info-label">✈️ ${f.type}</span>
-                        <div class="info-val">${f.info}</div>
-                        ${f.memo ? `<div class="info-memo">${f.memo}</div>` : ''}
-                    </div>`).join('') : '';
-            
-                container.innerHTML = `
-                    <div class="card home-card">
-                        <div class="icon">🌴</div>
-                        <h2>${db.destination}</h2>
-                        <p class="home-date-main">${db.date}</p>
-                        <div class="quick-info-box">${flightHtml}</div>
-                        <p style="margin-top:25px; font-size:0.75rem; opacity:0.5;">點擊右下角 ☰ 開始探索</p>
-                    </div>`;
+                const flightHtml = db.flights ? db.flights.map(f => `<div class="info-item"><span class="info-label">✈️ ${f.type}</span><div class="info-val">${f.info}</div></div>`).join('') : '';
+                container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div><p style="margin-top:20px; font-size:0.75rem; opacity:0.4;">Have a nice trip!</p></div>`;
             }
             else if(page === 'expenses') {
                 let total = 0;
@@ -159,7 +154,7 @@
                     return `<div class="list-item ${checkedItems['exp-'+i]?'done':''}" id="exp-${i}" onclick="toggleCheck('exp-${i}')"><span>${e.item}</span><span class="cost">$${e.cost}</span></div>`;
                 }).join('') + `<div class="total-box">總計：<span class="total-amount">$${total}</span></div>`;
             }
-            document.getElementById('content-wrapper').scrollTo(0, 0);
+            wrapper.scrollTo(0, 0);
         }
         init();
     </script>
