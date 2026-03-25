@@ -1,0 +1,15 @@
+{
+  "trip_name": "我的精彩旅行",
+  "destination": "尚未設定",
+  "date": "2026-00-00",
+  "notes": ["記得帶錢", "記得帶手機"],
+  "schedule": [
+    {"day": 1, "detail": "抵達目的地"},
+    {"day": 2, "detail": "自由行"}
+  ],
+  "gifts": ["名產 A", "名產 B"],
+  "expenses": [
+    {"item": "機票", "cost": "5000"},
+    {"item": "住宿", "cost": "3000"}
+  ]
+}
