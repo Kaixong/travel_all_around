@@ -86,20 +86,37 @@
         async function renderSchedule() {
             const container = document.getElementById('content');
             const dayData = db.schedule[currentDayIdx];
+            
             let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => {
                 const dateObj = new Date(d.date);
                 return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}<br><span class="tab-date">${dateObj.getMonth()+1}/${dateObj.getDate()}</span></button>`;
             }).join('') + `</div>`;
-
-            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div><div id="schedule-list"></div>`;
+        
+            // 新增飯店資訊 HTML
+            const hotelHtml = dayData.hotel ? `
+                <div class="hotel-card">
+                    <div class="hotel-header">🏨 今日下榻飯店</div>
+                    <div class="hotel-name">${dayData.hotel.name}</div>
+                    <div class="hotel-addr">${dayData.hotel.address}</div>
+                    ${dayData.hotel.link ? `<a href="${dayData.hotel.link}" target="_blank" class="map-link-mini">開啟地圖導航</a>` : ''}
+                </div>` : '';
+        
+            container.innerHTML = `
+                <h2 class="page-title">🗺️ 詳細行程</h2>
+                ${tabs}
+                <div id="weather-box" class="weather-box">正在獲取天氣...</div>
+                ${hotelHtml}
+                <div id="schedule-list"></div>`;
+            
             fetchWeather(dayData.location, dayData.date).then(info => { document.getElementById('weather-box').innerText = info; });
+            
             document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
                 <div class="schedule-item">
                     <div class="time-tag">${item.time}</div>
                     <div class="schedule-info">
                         <div class="schedule-title">${item.content}</div>
                         ${item.memo ? `<div class="schedule-memo">${item.memo}</div>` : ''}
-                        ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 查看地圖</a>` : ''}
+                        ${item.link ? `<a href="${item.link}" target="_blank" class="map-link">📍 地點詳情</a>` : ''}
                     </div>
                 </div>`).join('');
         }
@@ -119,7 +136,21 @@
                     list.map((item, i) => `<div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">${item}</div>`).join('');
             }
             else if(page === 'home') {
-                container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>${db.date}</p><p style="margin-top:20px; font-size:0.8rem; opacity:0.6;">Enjoy Your Vacation!</p></div>`;
+                const flightHtml = db.flights ? db.flights.map(f => `
+                    <div class="info-item">
+                        <span class="info-label">✈️ ${f.type}</span>
+                        <div class="info-val">${f.info}</div>
+                        ${f.memo ? `<div class="info-memo">${f.memo}</div>` : ''}
+                    </div>`).join('') : '';
+            
+                container.innerHTML = `
+                    <div class="card home-card">
+                        <div class="icon">🌴</div>
+                        <h2>${db.destination}</h2>
+                        <p class="home-date-main">${db.date}</p>
+                        <div class="quick-info-box">${flightHtml}</div>
+                        <p style="margin-top:25px; font-size:0.75rem; opacity:0.5;">點擊右下角 ☰ 開始探索</p>
+                    </div>`;
             }
             else if(page === 'expenses') {
                 let total = 0;
