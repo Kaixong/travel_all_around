@@ -3,54 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旅遊手冊</title>
+    <title>旅遊手冊 Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <header>
             <h1 id="trip-title">載入中...</h1>
-            <p id="trip-date"></p>
+            <div id="sub-header"></div>
         </header>
 
-        <div id="content" class="scroll-area">
-            </div>
+        <div id="content-wrapper">
+            <div id="content" class="fade-in">
+                </div>
+        </div>
 
         <nav class="tab-bar">
-            <button onclick="render('home')">首頁</button>
-            <button onclick="render('notes')">注意</button>
-            <button onclick="render('schedule')">行程</button>
-            <button onclick="render('gifts')">必買</button>
-            <button onclick="render('expenses')">明細</button>
+            <button onclick="changePage('home')">首頁</button>
+            <button onclick="changePage('notes')">注意</button>
+            <button onclick="changePage('schedule')">行程</button>
+            <button onclick="changePage('gifts')">必買</button>
+            <button onclick="changePage('expenses')">明細</button>
         </nav>
     </div>
 
     <script>
         let db = {};
+        let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
 
         async function init() {
-            // 讀取同資料夾下的 JSON 檔案
             const res = await fetch('data.json');
             db = await res.json();
             document.getElementById('trip-title').innerText = db.trip_name;
-            document.getElementById('trip-date').innerText = db.date;
-            render('home');
+            changePage('home');
         }
 
-        function render(page) {
+        function toggleCheck(id) {
+            checkedItems[id] = !checkedItems[id];
+            localStorage.setItem('trip_checked', JSON.stringify(checkedItems));
+            const el = document.getElementById(id);
+            if (checkedItems[id]) el.classList.add('done');
+            else el.classList.remove('done');
+        }
+
+        function changePage(page) {
             const container = document.getElementById('content');
-            let html = "";
+            const subHeader = document.getElementById('sub-header');
             
+            // 觸發切換動畫
+            container.classList.remove('fade-in');
+            void container.offsetWidth; // 強制重繪
+            container.classList.add('fade-in');
+
+            let html = "";
+            subHeader.innerHTML = ""; // 清空副標題
+
             if(page === 'home') {
-                html = `<div class="card"><h2>目的地：${db.destination}</h2><p>點擊下方選單查看細節</p></div>`;
-            } else if(page === 'notes') {
-                html = `<h2>注意事項</h2><ul>${db.notes.map(i => `<li>${i}</li>`).join('')}</ul>`;
-            } else if(page === 'schedule') {
-                html = `<h2>行程規劃</h2>${db.schedule.map(s => `<div class="item"><strong>Day ${s.day}</strong><p>${s.detail}</p></div>`).join('')}`;
-            } else if(page === 'gifts') {
-                html = `<h2>必買清單</h2><ul>${db.gifts.map(g => `<li>${g}</li>`).join('')}</ul>`;
-            } else if(page === 'expenses') {
-                html = `<h2>開銷明細</h2><table border="1">${db.expenses.map(e => `<tr><td>${e.item}</td><td>${e.cost}</td></tr>`).join('')}</table>`;
+                html = `<div class="card"><h2>${db.destination}</h2><p>日期：${db.date}</p><p>準備好出發了嗎？</p></div>`;
+            } 
+            else if(page === 'notes' || page === 'gifts') {
+                const list = page === 'notes' ? db.notes : db.gifts;
+                html = `<h2>${page==='notes'?'注意事項':'必買清單'}</h2>`;
+                html += list.map((item, i) => {
+                    const id = `${page}-${i}`;
+                    const isDone = checkedItems[id] ? 'done' : '';
+                    return `<div class="list-item ${isDone}" id="${id}" onclick="toggleCheck('${id}')">${item}</div>`;
+                }).join('');
+            } 
+            else if(page === 'schedule') {
+                html = `<h2>詳細行程</h2>`;
+                db.schedule.forEach(s => {
+                    html += `<div class="day-box">
+                                <div class="day-title">Day ${s.day}</div>
+                                <div class="day-content">${s.detail.replace(/\n/g, '<br>')}</div>
+                             </div>`;
+                });
+            } 
+            else if(page === 'expenses') {
+                let total = 0;
+                html = `<h2>開銷明細</h2>`;
+                html += db.expenses.map((e, i) => {
+                    const id = `exp-${i}`;
+                    const isDone = checkedItems[id] ? 'done' : '';
+                    total += parseInt(e.cost);
+                    return `<div class="list-item ${isDone}" id="${id}" onclick="toggleCheck('${id}')">
+                                <span>${e.item}</span><span>$${e.cost}</span>
+                            </div>`;
+                }).join('');
+                html += `<div class="total">總計：$${total}</div>`;
             }
             
             container.innerHTML = html;
