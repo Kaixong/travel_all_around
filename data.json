@@ -2,6 +2,10 @@
   "trip_name": "我的旅遊手冊 (2026版)",
   "destination": "福州三日遊",
   "date": "2026-03-27 ~ 2026-03-29",
+  "flights": [
+    { "type": "去程", "info": "B7271 09:00 台北(松山) -> 10:30 福州", "memo": "提早2小時報到" },
+    { "type": "回程", "info": "B7272 18:00 福州 -> 19:30 台北(松山)", "memo": "" }
+  ],
   "notes": [
     "台胞證 (正本)",
     "確認支付寶實名認證",
@@ -13,6 +17,7 @@
       "day": 1,
       "date": "2026-03-27",
       "location": "馬祖南竿",
+      "hotel": { "name": "福州大飯店", "address": "鼓樓區斗東路1號", "link": "https://maps.google.com/..." },
       "items": [
         { "time": "09:00", "content": "南竿碼頭取票", "link": "https://maps.app.goo.gl/xxx", "memo": "提早30分鐘抵達" },
         { "time": "14:00", "content": "抵達福州：三坊七巷", "link": "https://maps.app.goo.gl/yyy", "memo": "必看愛心樹" }
@@ -22,6 +27,7 @@
       "day": 2,
       "date": "2026-03-28",
       "location": "福州市煙台山",
+      "hotel": { "name": "福州大飯店", "address": "鼓樓區斗東路1號", "link": "https://maps.google.com/..." },
       "items": [
         { "time": "10:00", "content": "煙台山歷史風貌區", "link": "https://maps.app.goo.gl/zzz", "memo": "歐式建築攝影" },
         { "time": "18:00", "content": "閩江遊船", "link": "", "memo": "欣賞夜景" }
@@ -31,6 +37,7 @@
       "day": 3,
       "date": "2026-04-29",
       "location": "福州市",
+      "hotel": { "name": "福州大飯店", "address": "鼓樓區斗東路1號", "link": "https://maps.google.com/..." },
       "items": [
         { "time": "11:00", "content": "上下杭商圈", "link": "", "memo": "採買伴手禮" },
         { "time": "15:00", "content": "搭車前往碼頭回程", "link": "", "memo": "" }
