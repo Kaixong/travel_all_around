@@ -1,58 +1,69 @@
 {
-  "trip_name": "我的旅遊手冊 (2026版)",
-  "destination": "福州三日遊",
+  "trip_name": "福州悠閒三日遊",
+  "destination": "福州, 中國",
   "date": "2026-03-27 ~ 2026-03-29",
   "flights": [
-    { "type": "去程", "info": "B7271 09:00 台北(松山) -> 10:30 福州", "memo": "提早2小時報到" },
-    { "type": "回程", "info": "B7272 18:00 福州 -> 19:30 台北(松山)", "memo": "" }
+    { "type": "去程", "info": "B7271 09:00 台北(松山) -> 10:30 福州", "memo": "提早 2 小時報到" },
+    { "type": "回程", "info": "B7272 18:00 福州 -> 19:30 台北(松山)", "memo": "提早抵達機場逛免稅" }
   ],
   "notes": [
-    "台胞證 (正本)",
-    "確認支付寶實名認證",
-    "中港澳漫遊設定",
-    "預約小三通船票"
+    "台胞證與護照",
+    "行動電源與充電線",
+    "中港卡/網卡確認",
+    "下載支付寶/微信支付",
+    "高德地圖離線地圖"
   ],
   "schedule": [
     {
       "day": 1,
       "date": "2026-03-27",
-      "location": "馬祖南竿",
-      "hotel": { "name": "福州大飯店", "address": "鼓樓區斗東路1號", "link": "https://maps.google.com/..." },
+      "location": "福州市",
+      "hotel": { 
+        "name": "福州大飯店", 
+        "address": "鼓樓區斗東路1號", 
+        "link": "https://www.google.com/maps/search/?api=1&query=福州大飯店" 
+      },
       "items": [
-        { "time": "09:00", "content": "南竿碼頭取票", "link": "https://maps.app.goo.gl/xxx", "memo": "提早30分鐘抵達" },
-        { "time": "14:00", "content": "抵達福州：三坊七巷", "link": "https://maps.app.goo.gl/yyy", "memo": "必看愛心樹" }
+        { "time": "11:00", "content": "抵達福州，搭乘接駁前往飯店", "link": "", "memo": "" },
+        { "time": "12:30", "content": "午餐：當地肉燕與魚丸", "link": "", "memo": "" },
+        { "time": "14:00", "content": "三坊七巷散步", "link": "https://www.google.com/maps/search/?api=1&query=三坊七巷", "memo": "古色古香的建築群" }
       ]
     },
     {
       "day": 2,
       "date": "2026-03-28",
-      "location": "福州市煙台山",
-      "hotel": { "name": "福州大飯店", "address": "鼓樓區斗東路1號", "link": "https://maps.google.com/..." },
+      "location": "鼓山",
+      "hotel": { 
+        "name": "福州大飯店", 
+        "address": "鼓樓區斗東路1號", 
+        "link": "https://www.google.com/maps/search/?api=1&query=福州大飯店" 
+      },
       "items": [
-        { "time": "10:00", "content": "煙台山歷史風貌區", "link": "https://maps.app.goo.gl/zzz", "memo": "歐式建築攝影" },
-        { "time": "18:00", "content": "閩江遊船", "link": "", "memo": "欣賞夜景" }
+        { "time": "09:00", "content": "前往鼓山風景區", "link": "", "memo": "可以搭纜車上山" },
+        { "time": "15:00", "content": "上下杭歷史街區", "link": "", "memo": "看晚上的夜景很美" }
       ]
     },
     {
       "day": 3,
-      "date": "2026-04-29",
+      "date": "2026-03-29",
       "location": "福州市",
-      "hotel": { "name": "福州大飯店", "address": "鼓樓區斗東路1號", "link": "https://maps.google.com/..." },
+      "hotel": null,
       "items": [
-        { "time": "11:00", "content": "上下杭商圈", "link": "", "memo": "採買伴手禮" },
-        { "time": "15:00", "content": "搭車前往碼頭回程", "link": "", "memo": "" }
+        { "time": "10:00", "content": "西湖公園早起散步", "link": "", "memo": "" },
+        { "time": "13:00", "content": "最後採買伴手禮", "link": "", "memo": "" },
+        { "time": "15:30", "content": "前往機場準備回程", "link": "", "memo": "" }
       ]
     }
   ],
   "gifts": [
+    "福州橄欖",
     "茉莉花茶",
-    "同利肉燕",
-    "橄欖",
-    "漆器工藝品"
+    "壽山石小飾品",
+    "線面"
   ],
   "expenses": [
-    {"item": "船票", "cost": "1500"},
-    {"item": "飯店", "cost": "3200"},
-    {"item": "餐費預估", "cost": "3000"}
+    { "item": "機票費用", "cost": "8500" },
+    { "item": "飯店預收", "cost": "4200" },
+    { "item": "交通預算", "cost": "1500" }
   ]
 }
