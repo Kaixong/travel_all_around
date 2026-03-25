@@ -13,7 +13,8 @@
 body { 
     font-family: 'Fredoka', 'Noto Sans TC', sans-serif; 
     margin: 0; background: var(--bg); color: var(--text); 
-    transition: background 0.3s; overflow: hidden; 
+    transition: background 0.3s; overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #app { display: flex; flex-direction: column; height: 100vh; }
@@ -25,7 +26,7 @@ header {
 header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 .refresh-hint { font-size: 0.6rem; opacity: 0.5; display: block; }
 
-/* 滾動內容區優化 */
+/* 核心滑動優化：解決大拇指按在卡片滑不動 */
 #content-wrapper { 
     flex: 1; 
     overflow-y: scroll; 
@@ -33,21 +34,22 @@ header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
     padding: 20px 20px 120px 20px; 
     box-sizing: border-box;
     overscroll-behavior-y: contain;
+    touch-action: pan-y; /* 關鍵：強制垂直滑動 */
 }
 
-#content-wrapper::-webkit-scrollbar { width: 4px; }
-#content-wrapper::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-
-/* 元件樣式 */
-.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
-.card, .list-item, .schedule-info, .total-box { 
+.card, .list-item, .schedule-info, .total-box, .hotel-card { 
     background: var(--card-bg); padding: 20px; border-radius: 20px; 
     box-shadow: var(--shadow); margin-bottom: 15px; 
+    touch-action: pan-y; /* 關鍵：讓卡片區域也能觸發滑動 */
 }
+
+#content { user-select: none; -webkit-user-select: none; }
+
+/* 其他視覺樣式 */
+.page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
 .list-item { border-left: 8px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
 .list-item.done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
 
-/* 首頁資訊 */
 .quick-info-box {
     margin-top: 20px; text-align: left; background: var(--bg); 
     border-radius: 15px; padding: 15px; border: 1px dashed var(--primary);
@@ -55,36 +57,22 @@ header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 .info-label { font-size: 0.7rem; font-weight: bold; color: var(--primary); display: block; }
 .info-val { font-size: 0.85rem; margin-top: 2px; }
 
-/* 住宿卡片 */
-.hotel-card {
-    background: var(--secondary); border-radius: 18px; padding: 15px;
-    margin-bottom: 20px; border: 1.5px solid var(--accent);
-}
+.hotel-card { background: var(--secondary); border: 1.5px solid var(--accent); }
 .hotel-header { font-size: 0.7rem; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
 .hotel-name { font-size: 0.95rem; font-weight: 500; }
 .hotel-addr { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
 
-/* 行程分頁 */
 .day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-.day-tabs button { 
-    min-width: 75px; padding: 8px; border-radius: 12px; border: none; 
-    background: var(--card-bg); color: var(--subtext); font-size: 0.8rem;
-}
+.day-tabs button { min-width: 75px; padding: 8px; border-radius: 12px; border: none; background: var(--card-bg); color: var(--subtext); font-size: 0.8rem; }
 .day-tabs button.active { background: var(--secondary); border: 1px solid var(--accent); color: var(--text); font-weight: 500; }
 
-/* 天氣 */
-.weather-box { 
-    background: linear-gradient(135deg, #a7e5e6, var(--primary));
-    color: white; padding: 12px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-size: 0.85rem;
-}
+.weather-box { background: linear-gradient(135deg, #a7e5e6, var(--primary)); color: white; padding: 12px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-size: 0.85rem; }
 
-/* 時間軸 */
 .schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
 .time-tag { color: var(--primary); font-weight: 600; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
-.map-link, .map-link-mini { font-size: 0.7rem; color: var(--accent); border: 1px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; margin-top: 5px; display: inline-block; }
-.map-link-mini { background: var(--card-bg); border-color: transparent; }
+.map-link, .map-link-mini { font-size: 0.7rem; color: var(--accent); border: 1px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; display: inline-block; }
+.map-link-mini { background: var(--card-bg); border-color: transparent; margin-top: 8px; }
 
-/* 回到頂部按鈕 */
 #back-to-top {
     position: fixed; right: 25px; bottom: calc(100px + env(safe-area-inset-bottom));
     width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg);
@@ -94,20 +82,9 @@ header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 }
 #back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
-/* FAB 選單 */
-#fab-nav {
-    position: fixed; right: 20px; bottom: calc(25px + env(safe-area-inset-bottom));
-    display: flex; flex-direction: column; align-items: flex-end; z-index: 1000;
-}
-.fab-trigger {
-    width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: white; border: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.3rem; display: flex; align-items: center; justify-content: center; transition: 0.3s;
-}
-.nav-menu {
-    background: var(--card-bg); border-radius: 20px; padding: 10px; margin-bottom: 12px;
-    box-shadow: var(--shadow); border: 1px solid var(--primary);
-    display: flex; flex-direction: column; gap: 4px; transform-origin: bottom right; transition: 0.3s; width: 130px;
-}
+#fab-nav { position: fixed; right: 20px; bottom: calc(25px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: flex-end; z-index: 1000; }
+.fab-trigger { width: 55px; height: 55px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.3rem; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.nav-menu { background: var(--card-bg); border-radius: 20px; padding: 10px; margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--primary); display: flex; flex-direction: column; gap: 4px; transform-origin: bottom right; transition: 0.3s; width: 130px; }
 .nav-closed .nav-menu { transform: scale(0); opacity: 0; pointer-events: none; }
 .nav-closed .icon-close, #fab-nav:not(.nav-closed) .icon-open { display: none; }
 .nav-menu button { border: none; background: none; padding: 12px; text-align: left; color: var(--text); font-size: 0.9rem; display: flex; gap: 10px; }
