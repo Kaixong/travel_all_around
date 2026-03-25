@@ -10,42 +10,40 @@
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* 滾動優化核心：移除 body 限制，讓 window 負責滾動 */
 body { 
     font-family: 'Fredoka', 'Noto Sans TC', sans-serif; 
     margin: 0; background: var(--bg); color: var(--text); 
-    transition: background 0.3s; overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* 開啟 iOS 動量滾動 */
 }
 
-#app { display: flex; flex-direction: column; height: 100vh; }
+/* 增加最小高度確保一定可以產生滾動感 */
+main#content {
+    padding: 20px 20px 140px 20px; 
+    box-sizing: border-box;
+    min-height: 101vh; 
+}
 
+/* Header 固頂 */
 header { 
+    position: sticky; top: 0;
     background: var(--card-bg); color: var(--primary); padding: 15px; 
-    text-align: center; box-shadow: var(--shadow); cursor: pointer; z-index: 10;
+    text-align: center; box-shadow: var(--shadow); cursor: pointer; z-index: 1001;
 }
 header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 .refresh-hint { font-size: 0.6rem; opacity: 0.5; display: block; }
 
-/* 核心滑動優化：解決大拇指按在卡片滑不動 */
-#content-wrapper { 
-    flex: 1; 
-    overflow-y: scroll; 
-    -webkit-overflow-scrolling: touch; 
-    padding: 20px 20px 120px 20px; 
-    box-sizing: border-box;
-    overscroll-behavior-y: contain;
-    touch-action: pan-y; /* 關鍵：強制垂直滑動 */
-}
-
+/* 卡片設計：確保不攔截滾動手勢 */
 .card, .list-item, .schedule-info, .total-box, .hotel-card { 
     background: var(--card-bg); padding: 20px; border-radius: 20px; 
     box-shadow: var(--shadow); margin-bottom: 15px; 
-    touch-action: pan-y; /* 關鍵：讓卡片區域也能觸發滑動 */
+    touch-action: pan-y; /* 明確告知只處理垂直滑動 */
 }
 
-#content { user-select: none; -webkit-user-select: none; }
-
-/* 其他視覺樣式 */
+/* 其他視覺元件樣式維持一致 */
 .page-title { text-align: center; color: var(--primary); font-size: 1.1rem; margin-bottom: 20px; }
 .list-item { border-left: 8px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
 .list-item.done { opacity: 0.3; filter: grayscale(1); text-decoration: line-through; }
@@ -62,17 +60,18 @@ header h1 { margin: 0; font-size: 0.9rem; letter-spacing: 1px; }
 .hotel-name { font-size: 0.95rem; font-weight: 500; }
 .hotel-addr { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
 
-.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-.day-tabs button { min-width: 75px; padding: 8px; border-radius: 12px; border: none; background: var(--card-bg); color: var(--subtext); font-size: 0.8rem; }
+.day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; position: sticky; top: 75px; background: var(--bg); z-index: 9; padding-top: 5px; }
+.day-tabs button { min-width: 75px; padding: 8px; border-radius: 12px; border: none; background: var(--card-bg); color: var(--subtext); font-size: 0.8rem; box-shadow: var(--shadow); }
 .day-tabs button.active { background: var(--secondary); border: 1px solid var(--accent); color: var(--text); font-weight: 500; }
 
 .weather-box { background: linear-gradient(135deg, #a7e5e6, var(--primary)); color: white; padding: 12px; border-radius: 15px; margin-bottom: 20px; text-align: center; font-size: 0.85rem; }
 
 .schedule-item { display: flex; gap: 10px; margin-bottom: 20px; }
 .time-tag { color: var(--primary); font-weight: 600; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
-.map-link, .map-link-mini { font-size: 0.7rem; color: var(--accent); border: 1px solid var(--accent); padding: 3px 10px; border-radius: 20px; text-decoration: none; display: inline-block; }
+.map-link, .map-link-mini { font-size: 0.7rem; color: var(--accent); border: 1.2px solid var(--accent); padding: 4px 10px; border-radius: 20px; text-decoration: none; display: inline-block; }
 .map-link-mini { background: var(--card-bg); border-color: transparent; margin-top: 8px; }
 
+/* 懸浮元件 */
 #back-to-top {
     position: fixed; right: 25px; bottom: calc(100px + env(safe-area-inset-bottom));
     width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg);
