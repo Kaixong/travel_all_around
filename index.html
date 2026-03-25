@@ -32,9 +32,11 @@
         let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
 
         async function init() {
-            const res = await fetch('data.json');
+            // 加上 ?t=時間戳記，強制繞過 GitHub Pages 的快取
+            const res = await fetch('data.json?t=' + new Date().getTime());
             db = await res.json();
             document.getElementById('trip-title').innerText = db.trip_name;
+            document.getElementById('trip-date').innerText = db.date || "";
             changePage('home');
         }
 
