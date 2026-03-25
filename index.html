@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Vacation Journal</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -11,7 +11,7 @@
     <div id="app">
         <header onclick="init()">
             <h1 id="trip-title">載入中...</h1>
-            <span class="refresh-hint">點擊同步資料並回首頁 🔄</span>
+            <span class="refresh-hint">點擊同步並回首頁 🔄</span>
         </header>
 
         <div id="content-wrapper">
@@ -47,7 +47,6 @@
 
         if (localStorage.getItem('theme') === 'dark') document.body.className = 'dark-mode';
 
-        // 監聽滾動顯示回頂按鈕
         wrapper.onscroll = function() {
             if (wrapper.scrollTop > 300) bttBtn.classList.add('show');
             else bttBtn.classList.remove('show');
@@ -95,7 +94,7 @@
                 const min = Math.round(wData.daily.temperature_2m_min[0]);
                 const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
                 return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
-            } catch (e) { return "☁️ 天氣更新中..."; }
+            } catch (e) { return "☁️ 天氣同步中..."; }
         }
 
         async function renderSchedule() {
@@ -145,7 +144,7 @@
             }
             else if(page === 'home') {
                 const flightHtml = db.flights ? db.flights.map(f => `<div class="info-item"><span class="info-label">✈️ ${f.type}</span><div class="info-val">${f.info}</div></div>`).join('') : '';
-                container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div><p style="margin-top:20px; font-size:0.75rem; opacity:0.4;">Have a nice trip!</p></div>`;
+                container.innerHTML = `<div class="card home-card"><div class="icon">🌴</div><h2>${db.destination}</h2><p>${db.date}</p><div class="quick-info-box">${flightHtml}</div><p style="margin-top:20px; font-size:0.75rem; opacity:0.4;">Have a nice trip!</p></div>`;
             }
             else if(page === 'expenses') {
                 let total = 0;
