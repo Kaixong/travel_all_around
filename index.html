@@ -11,25 +11,28 @@
     <div id="app">
         <header onclick="init()">
             <h1 id="trip-title">載入中...</h1>
-            <span class="refresh-hint">點擊同步並回首頁 🔄</span>
+            <span class="refresh-hint">點擊同步資料 🔄</span>
         </header>
-
-        <nav id="side-nav" class="nav-closed">
-            <button class="toggle-nav" onclick="toggleNav()">☰</button>
-            <div class="nav-links">
-                <button onclick="changePage('home')">🏠 首頁</button>
-                <button onclick="changePage('notes')">🚩 準備</button>
-                <button onclick="changePage('schedule')">🗺️ 行程</button>
-                <button onclick="changePage('gifts')">🛍️ 伴手</button>
-                <button onclick="changePage('expenses')">💰 花費</button>
-                <hr>
-                <button class="mode-btn" onclick="toggleTheme()">🌓 切換模式</button>
-            </div>
-        </nav>
 
         <div id="content-wrapper">
             <div id="content"></div>
         </div>
+
+        <nav id="fab-nav" class="nav-closed">
+            <div class="nav-menu">
+                <button onclick="changePage('home')">🏠 <span>首頁</span></button>
+                <button onclick="changePage('notes')">🚩 <span>準備</span></button>
+                <button onclick="changePage('schedule')">🗺️ <span>行程</span></button>
+                <button onclick="changePage('gifts')">🛍️ <span>伴手</span></button>
+                <button onclick="changePage('expenses')">💰 <span>花費</span></button>
+                <hr>
+                <button class="mode-btn" onclick="toggleTheme()">🌓 <span>切換模式</span></button>
+            </div>
+            <button class="fab-trigger" onclick="toggleNav()">
+                <span class="icon-open">☰</span>
+                <span class="icon-close">✕</span>
+            </button>
+        </nav>
     </div>
 
     <script>
@@ -45,13 +48,12 @@
                 const res = await fetch(`data.json?t=${cacheBuster}`, { cache: "no-store" });
                 db = await res.json();
                 document.getElementById('trip-title').innerText = db.trip_name;
-                currentDayIdx = 0; // 重置天數
                 changePage('home');
-            } catch (e) { alert("更新失敗，請檢查網路"); }
+            } catch (e) { console.error("Update failed"); }
         }
 
         function toggleNav() {
-            document.getElementById('side-nav').classList.toggle('nav-closed');
+            document.getElementById('fab-nav').classList.toggle('nav-closed');
         }
 
         function toggleTheme() {
@@ -78,7 +80,7 @@
                 const min = Math.round(wData.daily.temperature_2m_min[0]);
                 const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
                 return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
-            } catch (e) { return "☁️ 暫無天氣資訊"; }
+            } catch (e) { return "☁️ 天氣連線中..."; }
         }
 
         async function renderSchedule() {
@@ -89,7 +91,7 @@
                 return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}<br><span class="tab-date">${dateObj.getMonth()+1}/${dateObj.getDate()}</span></button>`;
             }).join('') + `</div>`;
 
-            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在同步天氣...</div><div id="schedule-list"></div>`;
+            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在獲取天氣...</div><div id="schedule-list"></div>`;
             fetchWeather(dayData.location, dayData.date).then(info => { document.getElementById('weather-box').innerText = info; });
             document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
                 <div class="schedule-item">
@@ -108,8 +110,7 @@
             void container.offsetWidth;
             container.classList.add('fade-in');
             
-            // 點選後自動縮回選單
-            document.getElementById('side-nav').classList.add('nav-closed');
+            document.getElementById('fab-nav').classList.add('nav-closed');
 
             if(page === 'schedule') renderSchedule();
             else if(page === 'notes' || page === 'gifts') {
@@ -118,7 +119,7 @@
                     list.map((item, i) => `<div class="list-item ${checkedItems[page+'-'+i]?'done':''}" id="${page+'-'+i}" onclick="toggleCheck('${page+'-'+i}')">${item}</div>`).join('');
             }
             else if(page === 'home') {
-                container.innerHTML = `<div class="card home-card"><div class="icon">🌴</div><h2>${db.destination}</h2><p>${db.date}</p><p style="opacity:0.5; font-size:0.8rem;">點擊左側 ☰ 開始探索</p></div>`;
+                container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>${db.date}</p><p style="margin-top:20px; font-size:0.8rem; opacity:0.6;">Enjoy Your Vacation!</p></div>`;
             }
             else if(page === 'expenses') {
                 let total = 0;
