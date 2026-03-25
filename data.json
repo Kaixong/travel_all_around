@@ -9,15 +9,15 @@
       "items": [
         {
           "time": "09:00",
-          "content": "馬祖南竿碼頭",
-          "link": "https://maps.app.goo.gl/xxx",
-          "memo": "提早30分鐘取票"
+          "content": "馬祖南竿碼頭取票",
+          "link": "https://maps.app.goo.gl/XXXXX",
+          "memo": "提早30分鐘抵達"
         },
         {
           "time": "14:00",
-          "content": "三坊七巷",
-          "link": "https://maps.app.goo.gl/yyy",
-          "memo": "必拍愛心樹"
+          "content": "三坊七巷散步",
+          "link": "https://maps.app.goo.gl/YYYYY",
+          "memo": "必拍愛心樹，試試茉莉花茶"
         }
       ]
     },
@@ -26,9 +26,9 @@
       "items": [
         {
           "time": "10:00",
-          "content": "煙台山公園",
-          "link": "https://maps.app.goo.gl/zzz",
-          "memo": "很多歐式建築"
+          "content": "煙台山公園攝影",
+          "link": "",
+          "memo": "很多歐式老建築"
         }
       ]
     }
