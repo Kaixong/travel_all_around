@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Travel App</title>
+    <title>Vacation Journal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <header>
             <h1 id="trip-title">載入中...</h1>
-            <div id="trip-date"></div>
+            <div id="trip-date">Vacation Mode: ON</div>
         </header>
 
         <div id="content-wrapper">
@@ -18,11 +19,11 @@
         </div>
 
         <nav class="tab-bar">
-            <button onclick="changePage('home')">首頁</button>
-            <button onclick="changePage('notes')">注意</button>
-            <button onclick="changePage('schedule')">行程</button>
-            <button onclick="changePage('gifts')">必買</button>
-            <button onclick="changePage('expenses')">明細</button>
+            <button onclick="changePage('home')">首頁 🏖️</button>
+            <button onclick="changePage('notes')">準備 🚩</button>
+            <button onclick="changePage('schedule')">行程 🗺️</button>
+            <button onclick="changePage('gifts')">伴手 🛍️</button>
+            <button onclick="changePage('expenses')">花費 💰</button>
         </nav>
     </div>
 
@@ -32,12 +33,20 @@
         let checkedItems = JSON.parse(localStorage.getItem('trip_checked')) || {};
 
         async function init() {
-            // 強制更新機制
+            // 強制更新
             const res = await fetch('data.json?t=' + new Date().getTime());
             db = await res.json();
             document.getElementById('trip-title').innerText = db.trip_name;
-            document.getElementById('trip-date').innerText = db.date || "";
             changePage('home');
+        }
+
+        // 計算距離出發還有幾天
+        function getCountdown(startDate) {
+            const now = new Date();
+            const start = new Date(startDate);
+            const diff = start - now;
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            return days;
         }
 
         function toggleCheck(id) {
@@ -58,7 +67,8 @@
                 const code = wData.daily.weathercode[0];
                 const max = Math.round(wData.daily.temperature_2m_max[0]);
                 const min = Math.round(wData.daily.temperature_2m_min[0]);
-                const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨"}[code] || "🌤️ 多雲";
+                // 優化天氣圖示
+                const desc = {0:"☀️ 晴", 1:"🌤️ 多雲", 2:"⛅ 多雲", 3:"☁️ 陰", 45:"🌫️ 霧", 61:"🌧️ 雨", 63:"雨"}[code] || "🌤️ 多雲";
                 return `📍 ${location}：${min}°C ~ ${max}°C ${desc}`;
             } catch (e) { return "暫無天氣資訊"; }
         }
@@ -67,21 +77,21 @@
             const container = document.getElementById('content');
             const dayData = db.schedule[currentDayIdx];
             
-            // 生成按鈕：包含 Day X 以及 日期 (取月/日即可)
+            // 按鈕顯示：Day X + 日期 (月/日)
             let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => {
                 const dateObj = new Date(d.date);
                 const dateStr = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
                 return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">
-                            Day ${d.day}<br><span style="font-size:0.7rem; font-weight:normal;">${dateStr}</span>
+                            Day ${d.day}<br><span class="tab-date">${dateStr}</span>
                         </button>`;
             }).join('') + `</div>`;
-        
-            container.innerHTML = `<h2>🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在同步天氣...</div><div id="schedule-list"></div>`;
+
+            container.innerHTML = `<h2 class="page-title">🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在同步天氣...</div><div id="schedule-list"></div>`;
             
             fetchWeather(dayData.location, dayData.date).then(info => {
                 document.getElementById('weather-box').innerText = info;
             });
-        
+
             document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
                 <div class="schedule-item">
                     <div class="time-tag">${item.time}</div>
@@ -96,7 +106,8 @@
         function renderListPage(page) {
             const container = document.getElementById('content');
             const list = page === 'notes' ? db.notes : db.gifts;
-            container.innerHTML = `<h2>${page==='notes'?'🚩 注意事項':'🛍️ 必買清單'}</h2>` + 
+            const title = page === 'notes' ? '🚩 準備清單' : '🛍️ 伴手禮必買';
+            container.innerHTML = `<h2 class="page-title">${title}</h2>` + 
                 list.map((item, i) => {
                     const id = `${page}-${i}`;
                     return `<div class="list-item ${checkedItems[id]?'done':''}" id="${id}" onclick="toggleCheck('${id}')">${item}</div>`;
@@ -111,14 +122,28 @@
 
             if(page === 'schedule') renderSchedule();
             else if(page === 'notes' || page === 'gifts') renderListPage(page);
-            else if(page === 'home') container.innerHTML = `<div class="card home-card"><div class="icon">✈️</div><h2>${db.destination}</h2><p>準備出發！</p></div>`;
+            else if(page === 'home') {
+                const dateRange = db.date || "";
+                const daysToGo = dateRange ? getCountdown(dateRange.split(' ~ ')[0]) : "?";
+                const countdownText = daysToGo > 0 ? `距離出發還有 ${daysToGo} 天` : (daysToGo === 0 ? "今天出發！✈️" : "Enjoy Your Trip! 👋");
+
+                container.innerHTML = `
+                    <div class="card home-card">
+                        <div class="icon">🌴</div>
+                        <h2>${db.destination}</h2>
+                        <div class="countdown">${countdownText}</div>
+                        <p class="home-date">${dateRange}</p>
+                    </div>`;
+            }
             else if(page === 'expenses') {
                 let total = 0;
-                container.innerHTML = `<h2>💰 開銷明細</h2>` + db.expenses.map((e, i) => {
+                container.innerHTML = `<h2 class="page-title">💰 花費預算</h2>` + db.expenses.map((e, i) => {
                     const id = `exp-${i}`;
                     total += parseInt(e.cost);
-                    return `<div class="list-item ${checkedItems[id]?'done':''}" id="${id}" onclick="toggleCheck('${id}')"><span>${e.item}</span><span>$${e.cost}</span></div>`;
-                }).join('') + `<div class="total">總計預算：$${total}</div>`;
+                    return `<div class="list-item expense-item ${checkedItems[id]?'done':''}" id="${id}" onclick="toggleCheck('${id}')">
+                                <span>${e.item}</span><span class="cost">$${e.cost}</span>
+                            </div>`;
+                }).join('') + `<div class="total-box">總計：<span class="total-amount">$${total}</span></div>`;
             }
             document.getElementById('content-wrapper').scrollTo(0, 0);
         }
