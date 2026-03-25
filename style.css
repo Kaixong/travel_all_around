@@ -1,4 +1,3 @@
-/* --- 基礎變數與度假風配色 --- */
 :root { 
     --primary: #8acdd7; --secondary: #ffebcc; --accent: #ff9e7d;
     --bg: #fffbf5; --card-bg: #ffffff; --text: #4a4a4a; --subtext: #888888;
@@ -17,49 +16,57 @@ body {
     overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 
-/* --- Header 更新 --- */
+/* --- Header：左大標、右小標 --- */
 header { 
     position: sticky; top: 0; background: var(--card-bg); 
-    padding: 12px 15px; text-align: center; box-shadow: var(--shadow); z-index: 1001;
+    padding: 15px 20px; 
+    display: flex; align-items: baseline; justify-content: space-between;
+    box-shadow: var(--shadow); z-index: 1001; cursor: pointer;
 }
-header h1 { margin: 0; font-size: 1.1rem; color: var(--primary); font-weight: 700; }
-.refresh-hint { font-size: 0.7rem; opacity: 0.5; display: block; margin-top: 2px; font-family: 'Fredoka'; }
 
-main#content { padding: 15px 20px 140px 20px; box-sizing: border-box; min-height: 101vh; }
+header h1 { 
+    margin: 0; font-size: 0.95rem; color: var(--text); 
+    font-weight: 700; flex: 1; text-align: left;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
-/* --- 勾選清單 (Checkbox Style) --- */
+header .header-right span { 
+    font-size: 0.7rem; font-weight: 800; color: var(--primary); 
+    letter-spacing: 1px; font-family: 'Fredoka'; text-transform: uppercase;
+    padding-left: 10px;
+}
+
+main#content { padding: 10px 20px 140px 20px; box-sizing: border-box; min-height: 101vh; }
+
+/* --- 勾選清單 (Checkbox) --- */
 .list-item { 
-    background: var(--card-bg); padding: 16px; border-radius: 18px; 
+    background: var(--card-bg); padding: 18px; border-radius: 20px; 
     box-shadow: var(--shadow); margin-bottom: 12px;
     display: flex; align-items: center; gap: 15px;
-    touch-action: pan-y; transition: 0.3s; border: 1px solid transparent;
+    touch-action: pan-y; transition: 0.2s; border: 1.5px solid transparent;
 }
 
-/* 圓圈勾選框 */
 .checkbox {
-    width: 22px; height: 22px; border: 2px solid var(--primary);
-    border-radius: 50%; position: relative; flex-shrink: 0;
-    transition: 0.3s;
+    width: 24px; height: 24px; border: 2.5px solid var(--primary);
+    border-radius: 50%; position: relative; flex-shrink: 0; transition: 0.2s;
 }
 
-.list-item.done .checkbox {
-    background: var(--primary); border-color: var(--primary);
-}
-
+.list-item.done { opacity: 0.5; }
+.list-item.done .checkbox { background: var(--primary); border-color: var(--primary); }
 .list-item.done .checkbox::after {
     content: "✓"; color: white; position: absolute;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
     font-size: 14px; font-weight: bold;
 }
+.list-item.done .list-text { text-decoration: line-through; }
 
 .list-text { flex: 1; font-size: 0.95rem; font-weight: 500; }
-.list-item.done .list-text { opacity: 0.4; text-decoration: line-through; }
-.cost { font-weight: 700; color: var(--accent); }
+.cost { font-weight: 700; color: var(--accent); font-family: 'Fredoka'; }
 
-/* --- 行程分頁微調 --- */
+/* --- 行程分頁 --- */
 .day-tabs { 
     display: flex; gap: 8px; overflow-x: auto; 
-    padding: 5px 0 15px; position: sticky; top: 68px; 
+    padding: 10px 0 15px; position: sticky; top: 60px; 
     background: var(--bg); z-index: 1000;
 }
 .day-tabs button { 
@@ -68,34 +75,30 @@ main#content { padding: 15px 20px 140px 20px; box-sizing: border-box; min-height
 }
 .day-tabs button.active { background: var(--primary); color: white; font-weight: 600; }
 
-/* --- 機票與 Hero 維持美感 --- */
-.home-hero { text-align: center; padding: 10px 0 20px; }
-.hero-icon { font-size: 3rem; }
-.hero-title { font-size: 1.4rem; color: var(--text); }
-.section-label { font-size: 0.75rem; font-weight: bold; color: var(--primary); margin: 15px 0 10px 5px; letter-spacing: 1px; }
-
+/* --- 機票 --- */
 .ticket { background: var(--card-bg); border-radius: 20px; margin-bottom: 20px; box-shadow: var(--shadow); overflow: hidden; }
-.ticket-header { background: var(--primary); padding: 8px 15px; display: flex; justify-content: space-between; color: white; font-size: 0.75rem; }
-.ticket-body { padding: 20px 15px; display: flex; justify-content: space-between; align-items: center; }
-.station .code { font-size: 1.8rem; font-weight: 700; }
-.station .city { font-size: 0.7rem; opacity: 0.6; }
+.ticket-header { background: var(--primary); padding: 8px 15px; display: flex; justify-content: space-between; color: white; font-size: 0.7rem; font-weight: 600; }
+.ticket-body { padding: 25px 15px; display: flex; justify-content: space-between; align-items: center; }
+.station .code { font-size: 2rem; font-weight: 700; font-family: 'Fredoka'; }
+.station .city { font-size: 0.7rem; opacity: 0.6; margin-top: 4px; }
 .flight-icon { opacity: 0.3; flex: 1; text-align: center; font-size: 1.2rem; }
 .ticket-footer { padding: 12px 15px; border-top: 2px dashed var(--bg); display: flex; justify-content: space-between; font-size: 0.8rem; }
-.ticket-footer .time { color: var(--accent); font-weight: 600; }
+.ticket-footer .time { color: var(--accent); font-weight: 600; font-family: 'Fredoka'; }
 
-/* --- 飯店卡片 --- */
+/* --- 飯店、天氣、行程項目 --- */
 .hotel-card { background: var(--secondary); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1.2px solid var(--accent); }
 .hotel-header { font-size: 0.65rem; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
 .hotel-name { font-size: 0.95rem; font-weight: 600; margin: 4px 0; }
 
-/* --- 其他元件 --- */
-.weather-box { background: linear-gradient(135deg, #a7e5e6, var(--primary)); color: white; padding: 12px; border-radius: 15px; margin-bottom: 15px; text-align: center; font-size: 0.8rem; }
+.weather-box { background: linear-gradient(135deg, #a7e5e6, var(--primary)); color: white; padding: 12px; border-radius: 15px; margin-bottom: 15px; text-align: center; font-size: 0.8rem; font-weight: 500; }
+
 .schedule-item { display: flex; gap: 12px; margin-bottom: 20px; }
-.time-tag { color: var(--primary); font-weight: 700; min-width: 45px; font-size: 0.85rem; padding-top: 15px; }
+.time-tag { color: var(--primary); font-weight: 700; min-width: 45px; font-size: 0.85rem; padding-top: 15px; font-family: 'Fredoka'; }
 .schedule-info { flex: 1; border-left: 3px solid var(--primary); padding-left: 12px; }
 .schedule-title { font-weight: 600; font-size: 1rem; }
-.schedule-memo { font-size: 0.8rem; color: var(--subtext); }
+.schedule-memo { font-size: 0.8rem; color: var(--subtext); margin-top: 4px; }
 
+/* --- 懸浮元件 --- */
 #back-to-top { position: fixed; right: 25px; bottom: calc(100px + env(safe-area-inset-bottom)); width: 45px; height: 45px; border-radius: 50%; background: var(--card-bg); color: var(--primary); border: 1px solid var(--primary); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(20px); transition: 0.3s; pointer-events: none; z-index: 999; }
 #back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
@@ -108,5 +111,11 @@ main#content { padding: 15px 20px 140px 20px; box-sizing: border-box; min-height
 
 .fade-in { animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.total-box { text-align: right; padding: 20px; font-weight: 700; font-size: 1.1rem; }
-.total-amount { color: var(--accent); font-size: 1.3rem; }
+
+.total-box { text-align: right; padding: 20px; font-weight: 700; border-top: 2px dashed var(--primary); margin-top: 20px; }
+.total-amount { color: var(--accent); font-size: 1.5rem; margin-left: 5px; font-family: 'Fredoka'; }
+
+/* 首頁 Hero 微調 */
+.home-hero { text-align: center; padding: 20px 0; }
+.hero-title { font-size: 1.5rem; margin-top: 10px; }
+.hero-date { font-size: 0.85rem; opacity: 0.5; margin-top: 5px; font-family: 'Fredoka'; }
