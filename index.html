@@ -67,16 +67,21 @@
             const container = document.getElementById('content');
             const dayData = db.schedule[currentDayIdx];
             
-            let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => 
-                `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">Day ${d.day}</button>`
-            ).join('') + `</div>`;
-
+            // 生成按鈕：包含 Day X 以及 日期 (取月/日即可)
+            let tabs = `<div class="day-tabs">` + db.schedule.map((d, i) => {
+                const dateObj = new Date(d.date);
+                const dateStr = `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
+                return `<button class="${i===currentDayIdx?'active':''}" onclick="currentDayIdx=${i};renderSchedule();">
+                            Day ${d.day}<br><span style="font-size:0.7rem; font-weight:normal;">${dateStr}</span>
+                        </button>`;
+            }).join('') + `</div>`;
+        
             container.innerHTML = `<h2>🗺️ 詳細行程</h2>${tabs}<div id="weather-box" class="weather-box">正在同步天氣...</div><div id="schedule-list"></div>`;
             
             fetchWeather(dayData.location, dayData.date).then(info => {
                 document.getElementById('weather-box').innerText = info;
             });
-
+        
             document.getElementById('schedule-list').innerHTML = dayData.items.map(item => `
                 <div class="schedule-item">
                     <div class="time-tag">${item.time}</div>
